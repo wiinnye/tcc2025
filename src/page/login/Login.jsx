@@ -5,11 +5,10 @@ export function Login(){
 
     return(
         <Flex 
-        w="50%" 
+        w="100%" 
         h='100vh'
         alignItems={"center"} 
-        alignContent={"center"} 
-        justifyItems={"center"}
+        alignContent={"center"}
         flexDirection='column'
         >
             <Text fontSize="58px" >FuntLibra</Text>

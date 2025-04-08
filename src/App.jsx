@@ -1,7 +1,8 @@
 import { Flex } from "@chakra-ui/react"
+import './styles/global.css'
 import {BrowserRouter, Route, Routes } from "react-router-dom"
 import { Login } from "./page/login/Login"
-import './styles/global.css'
+import { Home } from "./page/Dashboard/Home"
 
 
 export default function App() {
@@ -10,6 +11,7 @@ export default function App() {
         <BrowserRouter>
           <Routes>
             <Route path='/' element={<Login />} />
+            <Route path='/home' element={<Home />} />
           </Routes>
         </BrowserRouter>
     </Flex>

@@ -14,8 +14,8 @@ html, body {
 
 .containerMain{
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
+  /* justify-content: center;
+  align-items: center; */
   min-height: 100vh;
   background-color:rgb(217, 235, 152);
 }
