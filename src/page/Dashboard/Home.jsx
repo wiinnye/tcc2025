@@ -1,36 +1,28 @@
 import {
-  Button,
   Flex,
   Input,
-  Textarea,
 } from "@chakra-ui/react";
 
 import { Menu } from "../../components/Menu/menu";
 import { useState } from "react";
-import VLibrasPlugin from "../../components/VlibrasPlugin/Vlibras";
+import { SpeechButton } from "../../components/Button/SpeechButton";
+
 
 export function Home() {
 
-  const [valor, setValor] = useState('');
+  let [valor, setValor] = useState('');
   const [mostraValor, setMostraValor] = useState('');
-  
+  const [text, setText] = useState('');
 
-  const handleButtonClick = () => {
-    if (valor.trim() !== '') { 
-      setMostraValor(valor);
 
-// Força o VLibras a detectar o novo texto
-setTimeout(() => {
-  const el = document.querySelector('[aria-label="libras-texto"]');
-  if (el) {
-    const event = new Event('input', { bubbles: true });
-    el.dispatchEvent(event);
+const handleButtonClick = () => {
+  if (valor.trim() !== '') {
+    setMostraValor(valor);
+  } else {
+    alert('O campo de input não pode estar vazio!');
   }
-}, 300); // espera um pouco para o texto renderizar
-    } else {
-      alert('O campo de input não pode estar vazio!');
-    }
-  };
+};
+
 
   return (
     <Flex w="100%" direction='column'>
@@ -44,31 +36,27 @@ setTimeout(() => {
      > 
         <Flex w='100%' direction='column' align='center'>
           <Input 
-          w='70%'
-          h='100px'
+          w={{base:'250px', s:'450px', md:'450px', lg:'450px'}}
+          h='50px'
+          p='.7rem' 
           bg='#fff' 
           borderColor='#000'
           value={valor}
           onChange={(e) => setValor(e.target.value)}
           />
-          <Button 
-          w='70%' 
-          mt='1rem'
-          onClick={handleButtonClick}
-          >Traduzir</Button>
+        <SpeechButton
+          text={text}
+          setText={setText}
+          mostraValor={mostraValor}
+          setMostraValor={setMostraValor}
+          setValor={setValor}
+          handleButtonClick={handleButtonClick}
+        />
         </Flex>
-        <Flex w='100%' direction='column'>
-          <Textarea 
-          w='100%' 
-          h='200px'
-          bg='#fff' 
-          value={mostraValor}
-          readOnly
-          aria-label="libras-texto"
-          />
-        </Flex>
+       
      </Flex>
-     <VLibrasPlugin />
     </Flex>
   );
 }
+
+
