@@ -6,7 +6,7 @@ import {
 import { Menu } from "../../components/Menu/menu";
 import { useState } from "react";
 import { SpeechButton } from "../../components/Button/SpeechButton";
-
+import { VideoList } from "../../components/VideoLista/video";
 
 export function Home() {
 
@@ -52,6 +52,9 @@ const handleButtonClick = () => {
           setValor={setValor}
           handleButtonClick={handleButtonClick}
         />
+
+      <VideoList busca={mostraValor} />
+
         </Flex>
        
      </Flex>
