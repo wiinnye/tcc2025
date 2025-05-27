@@ -1,41 +1,42 @@
 import { useEffect, useState } from "react";
+import { db } from "../../services/api";
+import { collection, query, where, getDocs } from "../../services/firebase";
 import { Box, Text } from "@chakra-ui/react";
-import { buscarVideo } from "../../services/api";
 
 export function VideoList({ busca }) {
-  const [videoUrl, setVideoUrl] = useState("");
+  const [videos, setVideos] = useState([]);
   const [carregando, setCarregando] = useState(false);
   const [naoEncontrado, setNaoEncontrado] = useState(false);
 
   useEffect(() => {
-    const buscar = async () => {
+    const buscarVideo = async () => {
       if (!busca || busca.trim() === "") {
-        setVideoUrl("");
+        setVideos([]);
         setNaoEncontrado(false);
         return;
       }
 
       setCarregando(true);
       setNaoEncontrado(false);
-
       try {
-        const resultado = await buscarVideo(busca);
+        const q = query(collection(db, "videos"), where("libra", "==", busca.toLowerCase()));
+        const snapshot = await getDocs(q);
 
-        if (resultado.encontrado) {
-          setVideoUrl(resultado.url);
-        } else {
+        if (snapshot.empty) {
           setNaoEncontrado(true);
-          setVideoUrl("");
+          setVideos([]);
+        } else {
+          const lista = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+          setVideos(lista);
         }
-      } catch {
+      } catch (erro) {
+        console.error("Erro ao buscar vídeo:", erro);
         setNaoEncontrado(true);
-        setVideoUrl("");
       }
-
       setCarregando(false);
     };
 
-    buscar();
+    buscarVideo();
   }, [busca]);
 
   return (
@@ -43,15 +44,15 @@ export function VideoList({ busca }) {
       {carregando && <Text>Buscando vídeo...</Text>}
       {naoEncontrado && <Text>Nenhum vídeo encontrado com esse título.</Text>}
 
-      {videoUrl && (
-        <Box mb={6}>
-          <Text fontWeight="bold" mb={2}>{busca}</Text>
+      {videos.map(video => (
+        <Box key={video.id} mb={6}>
+          <Text fontWeight="bold" mb={2}>{video.titulo}</Text>
           <video width="320" height="240" controls>
-            <source src={videoUrl} type="video/mp4" />
+            <source src={video.url} type="video/mp4" />
             Seu navegador não suporta vídeo.
           </video>
         </Box>
-      )}
+      ))}
     </Box>
   );
 }
