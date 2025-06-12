@@ -46,7 +46,7 @@ export function VideoMostrar() {
   };
 
   const handleVoltar = () => {
-    navigate("/home");
+    navigate("/traducao");
   };
 
   return (
