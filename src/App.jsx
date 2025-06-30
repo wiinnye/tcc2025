@@ -1,5 +1,5 @@
 import { Flex } from "@chakra-ui/react";
-import "./styles/global.css";
+import "./services/styles/global.css"
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Login } from "./page/login/Login";
 import { Home } from "./page/Dashboard/Home";
@@ -21,6 +21,7 @@ export default function App() {
           <Route path="/uploadVideo" element={<UploadVideo />} />
           <Route path="/recuperarSenha" element={<RecuperarSenha />} />
           <Route path="/traducao/:texto" element={<VideoMostrar />} />
+          <Route path="/traducao/categoria/:categoria" element={<VideoMostrar />} />
         </Routes>
       </BrowserRouter>
     </Flex>

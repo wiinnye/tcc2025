@@ -10,11 +10,14 @@ import {
 import { useState } from "react";
 import bgFuntlibra from "../../image/bgFuntlibra.png";
 import { IoEyeSharp, IoEyeOff } from "react-icons/io5";
-// import { useNavigate } from "react-router-dom";
+import { auth, db } from "../../services/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 export function CadastroUsuario() {
   const isMobile = useBreakpointValue({ base: true, md: false });
-  // const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const [senha, setSenha] = useState("");
   const [nomeUsuario, setNomeUsuario] = useState("");
@@ -25,7 +28,7 @@ export function CadastroUsuario() {
   const [erroSenha, setErroSenha] = useState("");
   const [mensagem, setMensagem] = useState("");
 
-  const handleSubmit = () => {
+  const handleSubmit = async()  => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     // 1️⃣ Verificar se todos os campos estão preenchidos
@@ -64,11 +67,49 @@ export function CadastroUsuario() {
 
     console.log(resultInfoUsuario);
 
-    // Aqui você pode fazer o envio dos dados, navegação, etc.
-    // navigate("/traducao");
+     try {
+    // Cria usuário no Firebase Authentication
+    const userCredential = await createUserWithEmailAndPassword(
+      auth,
+      emailUsuario,
+      senha
+    );
+    const user = userCredential.user;
+
+    // Salva no Firestore
+    await setDoc(doc(db, "usuarios", user.uid), {
+      nome: nomeUsuario,
+      email: emailUsuario,
+      senha: senha,
+      tipo: "aluno", // 👈 aqui define o tipo: "aluno" ou "interprete"
+    });
+
+    setMensagem("✅ Conta criada com sucesso!");
+    navigate("/")
+    console.log("Usuário salvo:", user.uid);
+  } catch (erro) {
+    console.error("❌ Erro ao criar usuário:", erro);
+    setErroSenha("Erro ao criar usuário. Verifique os dados.");
+  }
+
   };
 
   return (
+    <>
+    {isMobile && (
+              <Box
+                position="absolute"
+                top={0}
+                left={0}
+                w="100vw"
+                h="100vh"
+                backgroundImage={`url(${bgFuntlibra})`}
+                backgroundSize="cover"
+                backgroundPosition="center"
+                zIndex={0}
+              />
+         )}
+  
     <Flex
       w="100%"
       h="100vh"
@@ -77,7 +118,10 @@ export function CadastroUsuario() {
       flexDirection={{ base: "column", md: "row" }}
       bg="#F3F5FC"
     >
-      <Flex w="50%" alignItems="center" flexDirection="column">
+      <Flex w={{base:"100%", lg:"50%"}} h="100%" alignItems={"center"} flexDirection="column" position="relative" zIndex={1}>
+        <Flex w='100%' h='20%' justify="start" align='center' pl='2rem'>
+          <Button w="100px" color='#F3F5FC' bg='#579b3e' onClick={() => navigate("/")} fontSize='20px'> Voltar</Button>
+        </Flex>
         <Flex
           w={{ base: "300px", md: "350px", lg: "500px" }}
           h="auto"
@@ -219,5 +263,6 @@ export function CadastroUsuario() {
         </Flex>
       )}
     </Flex>
+  </>
   );
 }

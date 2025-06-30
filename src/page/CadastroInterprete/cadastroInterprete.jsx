@@ -10,11 +10,15 @@ import {
 import bgFuntlibra from "../../image/bgFuntlibra.png";
 import { useState } from "react";
 import { IoEyeOff, IoEyeSharp } from "react-icons/io5";
+import { auth, db } from "../../services/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import InputMask from "react-input-mask";
+import { useNavigate } from "react-router-dom";
+import { doc, setDoc } from "firebase/firestore";
 
 export function CadastroInterprete() {
   const isMobile = useBreakpointValue({ base: true, md: false });
-
+  const navigate = useNavigate();
   const [senha, setSenha] = useState("");
   const [nomeInterprete, setNomeInterprete] = useState("");
   const [emailInterprete, setEmailInterprete] = useState("");
@@ -58,7 +62,7 @@ export function CadastroInterprete() {
   return true;
 }
 
-  const handleSubmit = () => {
+  const handleSubmit = async() => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!nomeInterprete || !emailInterprete || !senha || !confirmarSenha) {
@@ -105,23 +109,68 @@ export function CadastroInterprete() {
 
     console.log(resultInfoInterprete);
 
-    // navigate("/traducao");
+    try {
+        // Cria usuário no Firebase Authentication
+        const userCredential = await createUserWithEmailAndPassword(
+          auth,
+          emailInterprete,
+          senha,
+          cdiInterprete, 
+          cpfInterprete
+        );
+        const user = userCredential.user;
+    
+        // Salva no Firestore
+        await setDoc(doc(db, "usuarios", user.uid), {
+          nome: nomeInterprete,
+          email: emailInterprete,
+          cdi: cdiInterprete,
+          cpf: cpfInterprete,
+          senha: senha,
+          tipo: "interprete", // 👈 aqui define o tipo: "aluno" ou "interprete"
+        });
+    
+        setMensagem("✅ Conta criada com sucesso!");
+        navigate("/")
+        console.log("Usuário salvo:", user.uid);
+      } catch (erro) {
+        console.error("❌ Erro ao criar usuário:", erro);
+        setErroSenha("Erro ao criar usuário. Verifique os dados.");
+      }
+    
   };
 
   return (
+    <>
+     {isMobile && (
+          <Box
+            position="absolute"
+            top={0}
+            left={0}
+            w="100vw"
+            h="100vh"
+            backgroundImage={`url(${bgFuntlibra})`}
+            backgroundSize="cover"
+            backgroundPosition="center"
+            zIndex={0}
+          />
+     )}
+    
+
     <Flex
       w="100%"
       h="100vh"
-      alignItems={"center"}
-      alignContent={"center"}
       justify={"center"}
       flexDirection={{ base: "column", md: "row", lg: "row" }}
       bg={"#F3F5FC"}
     >
-      <Flex w="50%" maxH="100%" alignItems={"center"} flexDirection="column">
+      <Flex w={{base:"100%", lg:"50%"}} h="100%" alignItems={"center"} flexDirection="column" position="relative" zIndex={1}>
+        <Flex w='100%' h='20%' justify="start" align='center' pl='2rem'>
+          <Button w="100px" color='#F3F5FC' bg='#579b3e' onClick={() => navigate("/")} fontSize='20px'> Voltar</Button>
+        </Flex>
         <Flex
           w={{ base: "300px", s: "150px", md: "350px", lg: "500px" }}
-          h={{ base: "350px", s: "250px", md: "350px", lg: "500px" }}
+          h="500px"
           alignItems={"center"}
           alignContent={"center"}
           justify={"center"}
@@ -280,5 +329,6 @@ export function CadastroInterprete() {
         </Flex>
       )}
     </Flex>
-  );
+  </>
+  );  
 }

@@ -1,17 +1,27 @@
 import { useState } from "react";
-import { Box, Button, Flex, Input, Text } from "@chakra-ui/react";
+import {
+  Box,
+  Button,
+  Flex,
+  Input,
+  Text,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { uploadVideoToCloudinary } from "../../services/cloudinaryService";
 import { salvarVideoNoFirestore } from "../../services/api";
 
 export function UploadVideo() {
-  const [titulo, setTitulo] = useState("");
+  const [titulo, setTitulo] = useState("");       // Categoria (ex: html)
+  const [nomeVideo, setNomeVideo] = useState(""); // Nome do vídeo
   const [file, setFile] = useState(null);
   const [carregando, setCarregando] = useState(false);
   const [mensagem, setMensagem] = useState("");
 
+  const isMobile = useBreakpointValue({ base: true, md: false });
+
   const handleUpload = async () => {
-    if (!titulo || !file) {
-      setMensagem("⚠️ Preencha o título e selecione um vídeo.");
+    if (!titulo.trim() || !nomeVideo.trim() || !file) {
+      setMensagem("⚠️ Preencha todos os campos e selecione um vídeo.");
       return;
     }
 
@@ -19,14 +29,12 @@ export function UploadVideo() {
     setMensagem("");
 
     try {
-      // 1. Upload para o Cloudinary
       const url = await uploadVideoToCloudinary(file);
-
-      // 2. Salvar no Firestore na coleção 'videos', documento 'libra'
-      await salvarVideoNoFirestore(titulo, url);
+      await salvarVideoNoFirestore(titulo, url, nomeVideo);
 
       setMensagem("✅ Vídeo enviado com sucesso!");
       setTitulo("");
+      setNomeVideo("");
       setFile(null);
     } catch (error) {
       console.error("Erro no upload:", error);
@@ -37,16 +45,41 @@ export function UploadVideo() {
   };
 
   return (
-    <Flex direction="column" p={6} bg="gray.50" borderRadius="md" shadow="md" maxW="400px" mx="auto">
-      <Text fontSize="xl" mb={4} fontWeight="bold">
+    <Flex
+      direction="column"
+      p={6}
+      bg="gray.50"
+      borderRadius="md"
+      shadow="md"
+      w="100%"
+      maxW={{ base: "100%", md: "480px" }}
+      mx="auto"
+      mt={8}
+    >
+      <Text
+        fontSize={{ base: "lg", md: "xl" }}
+        mb={4}
+        fontWeight="bold"
+        color="blue.700"
+        textAlign="center"
+      >
         Cadastro de Vídeo - Intérprete Libras
       </Text>
 
       <Input
-        placeholder="Título do vídeo (ex.: html)"
+        placeholder="Categoria (ex.: html)"
         mb={3}
         value={titulo}
         onChange={(e) => setTitulo(e.target.value)}
+        size={isMobile ? "md" : "lg"}
+      />
+
+      <Input
+        placeholder="Nome descritivo do vídeo"
+        mb={3}
+        value={nomeVideo}
+        onChange={(e) => setNomeVideo(e.target.value)}
+        size={isMobile ? "md" : "lg"}
       />
 
       <Input
@@ -54,6 +87,7 @@ export function UploadVideo() {
         accept="video/*"
         mb={3}
         onChange={(e) => setFile(e.target.files[0])}
+        size={isMobile ? "md" : "lg"}
       />
 
       <Button
@@ -62,6 +96,7 @@ export function UploadVideo() {
         isLoading={carregando}
         loadingText="Enviando..."
         mb={3}
+        size={isMobile ? "md" : "lg"}
       >
         Enviar vídeo
       </Button>
@@ -70,9 +105,10 @@ export function UploadVideo() {
         <Box
           bg={mensagem.includes("❌") ? "red.100" : "green.100"}
           color={mensagem.includes("❌") ? "red.600" : "green.600"}
-          p={2}
+          p={3}
           borderRadius="md"
           textAlign="center"
+          fontSize={{ base: "sm", md: "md" }}
         >
           {mensagem}
         </Box>
