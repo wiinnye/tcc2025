@@ -1,12 +1,15 @@
 import { db } from "../services/firebase";
-import { doc, query, where, getDocs, addDoc, collection} from "firebase/firestore";
-
+import { doc, getDocs, getDoc, setDoc} from "firebase/firestore";
+import { useEffect, useState } from "react";
+import { auth } from "../services/firebase"; // seu firebase.js
+import { onAuthStateChanged } from "firebase/auth"
 
 /**
  * Salvar vídeo no documento 'libra' da coleção 'videos'
  * @param {string} titulo - Nome do campo
  * @param {string} url - URL do vídeo
  * @param {string} categoria - URL do vídeo
+ *  @param {string} thumbnail - thumbnail do vídeo
  */
 
 export async function buscarVideo(titulo) {
@@ -32,17 +35,26 @@ export async function buscarVideo(titulo) {
   }
 }
 
-
 // 👉 BUSCAR vídeos da categoria (com nome e url)
 export async function buscarVideosDaCategoria(categoria) {
-  const videosRef = collection(db, "videos");
-  const q = query(videosRef, where("categoria", "==", categoria));
-  const querySnapshot = await getDocs(q);
-  const resultados = [];
-  querySnapshot.forEach((doc) => {
-    resultados.push(doc.data());
-  });
-  return resultados;
+ try {
+    const docRef = doc(db, "videos", "libra");
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const todosVideos = docSnap.data().videos || [];
+      const filtrados = todosVideos.filter(
+        (video) => video.categoria.toLowerCase() === categoria.toLowerCase()
+      );
+      return filtrados;
+    } else {
+      console.warn("Documento 'libra' não encontrado.");
+      return [];
+    }
+  } catch (erro) {
+    console.error("Erro ao buscar vídeos:", erro);
+    return [];
+  }
 }
 // 👉 BUSCAR por categoria (modo geral)
 export async function buscarPorCategoria(categoria) {
@@ -71,12 +83,50 @@ export async function buscarPorCategoria(categoria) {
   }
 }
 
-
 // 👉 SALVAR vídeo (com nome e url)
-export const salvarVideoNoFirestore = async (categoria, url, titulo) => {
-  await addDoc(collection(db, "videos"), {
-    titulo: titulo.toLowerCase(), // para buscas funcionarem melhor
-    categoria: categoria.toLowerCase(),
+export async function salvarVideoNoFirestore(categoria, url, titulo, thumbnail) {
+  const docRef = doc(db, "videos", "libra"); // documento fixo chamado "libra"
+  const snapshot = await getDoc(docRef);
+
+  const novoVideo = {
+    titulo,
     url,
-  });
-};
+    categoria,
+    thumbnail,
+  };
+
+  let novosDados = {};
+
+  if (snapshot.exists()) {
+    const dadosAnteriores = snapshot.data();
+    const novaChave = `video_${Object.keys(dadosAnteriores).length + 1}`;
+
+    novosDados[novaChave] = novoVideo;
+  } else {
+    // se for o primeiro vídeo
+    novosDados["video_1"] = novoVideo;
+  }
+
+  await setDoc(docRef, novosDados, { merge: true });
+}
+
+export function useAuth() {
+  const [usuario, setUsuario] = useState(null);
+  const [carregando, setCarregando] = useState(true);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setUsuario(user);
+      } else {
+        setUsuario(null);
+      }
+      setCarregando(false);
+    });
+
+    return () => unsubscribe(); // Limpa o listener quando desmontar
+  }, []);
+
+  return { usuario, carregando };
+}
+

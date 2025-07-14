@@ -1,410 +1,272 @@
+// import { useParams } from "react-router-dom";
 // import { useEffect, useState } from "react";
-// import { Box, Button, Flex, Text, VStack } from "@chakra-ui/react";
-// import { buscarVideo } from "../../services/api";
-// import { useNavigate, useParams } from "react-router-dom";
+// import { Flex, Text, Spinner, Stack } from "@chakra-ui/react";
+// import { db } from "../../services/firebase";
+// import { doc, getDoc } from "firebase/firestore";
+// import { MenuUsuario } from "../../components/Menu/menu";
 
 // export function VideoMostrar() {
-//   const navigate = useNavigate();
-//   const { texto } = useParams(); // pega o texto da URL
-//   const [videoUrl, setVideoUrl] = useState("");
-//   const [carregando, setCarregando] = useState(false);
-//   const [naoEncontrado, setNaoEncontrado] = useState(false);
+//   const { categoria } = useParams(); // pega o nome da categoria da URL
+//   const [videos, setVideos] = useState([]);
+//   const [carregando, setCarregando] = useState(true);
 
 //   useEffect(() => {
-//     const buscar = async () => {
-//       if (!texto || texto.trim() === "") {
-//         setVideoUrl("");
-//         setNaoEncontrado(false);
-//         return;
-//       }
-
+//     const buscarVideos = async () => {
 //       setCarregando(true);
-//       setNaoEncontrado(false);
 
 //       try {
-//         const resultado = await buscarVideo(decodeURIComponent(texto));
+//         const docRef = doc(db, "videos", "libra"); // único documento com todos os vídeos
+//         const docSnap = await getDoc(docRef);
 
-//         if (resultado.encontrado) {
-//           setVideoUrl(resultado.url);
-//         } else {
-//           setNaoEncontrado(true);
-//           setVideoUrl("");
+//         if (docSnap.exists()) {
+//           const data = docSnap.data();
+
+//           // Converte os vídeos (que estão como objetos) para um array
+//           const todosVideos = Object.values(data);
+
+//           // Filtra pelos vídeos da categoria atual
+//           const filtrados = todosVideos.filter(
+//             (video) =>
+//               video.categoria &&
+//               video.categoria.toLowerCase() === categoria.toLowerCase()
+//           );
+
+//           setVideos(filtrados);
 //         }
-//       } catch {
-//         setNaoEncontrado(true);
-//         setVideoUrl("");
+//       } catch (erro) {
+//         console.error("Erro ao buscar vídeos:", erro);
 //       }
 
 //       setCarregando(false);
 //     };
 
-//     buscar();
-//   }, [texto]);
-
-//     const handleProduzirNovamente = () => {
-//     navigate(`/traducao/${texto}`);
-//   };
-
-//   const handleVoltar = () => {
-//     navigate("/traducao");
-//   };
+//     buscarVideos();
+//   }, [categoria]);
 
 //   return (
-//      <Flex
-//       minH="100vh"
-//       w="100%"
-//       bg="#F3F5FC"
-//       justify="center"
-//       align="center"
-//       p={4}
-//       direction='column'
-//     >
-//       <VStack
-//         spacing={6}
-//         bg="#6AB04C"
+//     <>
+//       <MenuUsuario />
+//       <Flex
+//         minH="100vh"
+//         w="100%"
+//         direction="column"
+//         align="center"
+//         justify="center"
 //         p={6}
-//         borderRadius="lg"
-//         boxShadow="lg"
-//         w={{ base: "100%", md: "600px", lg: "700px" }}
 //       >
-//         {carregando && <Text>Buscando vídeo...</Text>}
-//         {naoEncontrado && <Text>Nenhum vídeo encontrado.</Text>}
+//         <Text fontSize="2xl" fontWeight="bold" mb={4}>
+//           Vídeos da categoria: {categoria}
+//         </Text>
 
-//         {videoUrl && (
-//           <Box w="100%">
-//             <video width="100%" controls>
-//               <source src={videoUrl} type="video/mp4" />
-//               Seu navegador não suporta vídeo.
-//             </video>
-//           </Box>
+//         {carregando ? (
+//           <Spinner size="lg" color="#6AB04C" />
+//         ) : videos.length === 0 ? (
+//           <Text>Nenhum vídeo encontrado.</Text>
+//         ) : (
+//           <Flex w="50%" h='50%'>
+//             {videos.map((video, index) => (
+//               <Flex
+//                 key={index}
+//                 direction="column"
+//                 p={4}
+//                 // bg="#F3F5FC"
+//                 bg='#6AB04C'
+//                 border="1px solid #6AB04C"
+//                 borderRadius="md"
+//                 boxShadow="md"
+//               >
+//                 <Text fontWeight="bold" mb={2}>
+//                   {video.titulo}
+//                 </Text>
+//                 <video width="50%" controls>
+//                   <source src={video.url} type="video/mp4" />
+//                 </video>
+//               </Flex>
+//             ))}
+//           </Flex>
 //         )}
-
-//         <Text fontSize="2xl" fontWeight="bold" color="#fff">
-//           {texto}
-//         </Text>
-
-//         <Text textAlign="center" color="#fff">
-//           Aqui está a tradução da palavra "<strong>{texto}</strong>" para Libras.
-//           Se desejar, você pode gerar novamente ou voltar para a tela inicial.
-//         </Text>
-//       </VStack>
-//         <Flex gap={4} wrap="wrap" mt='2rem'>
-//           <Button
-//             w='200px'
-//             bg="#6AB04C"
-//             color="white"
-//             borderRadius='15px'
-//             padding='24px'
-//             _hover={{ bg: "#579b3e" }}
-//             onClick={handleProduzirNovamente}
-//           >
-//             Produzir Novamente
-//           </Button>
-//           <Button
-//             w='200px'
-//             variant="outline"
-//             borderColor="#6AB04C"
-//             borderRadius='15px'
-//             padding='24px'
-//             color="#6AB04C"
-//             _hover={{ bg: "#e8f5e9" }}
-//             onClick={handleVoltar}
-//           >
-//             Voltar
-//           </Button>
-//         </Flex>
-//     </Flex>
+//       </Flex>
+//     </>
 //   );
 // }
-
-
-// import { useEffect, useState } from "react";
-// import { Box, Button, Flex, Text, VStack } from "@chakra-ui/react";
-// import { buscarVideo, buscarVideosDaCategoria } from "../../services/api";
-// import { useNavigate, useParams } from "react-router-dom";
-
-// export function VideoMostrar() {
-//   const navigate = useNavigate();
-//   const { texto, categoria } = useParams();
-//   const [videoUrl, setVideoUrl] = useState("");
-//   const [listaVideos, setListaVideos] = useState([]);
-//   const [carregando, setCarregando] = useState(false);
-//   const [naoEncontrado, setNaoEncontrado] = useState(false);
-
-
-//   useEffect(() => {
-//   const buscar = async () => {
-//     setCarregando(true);
-//     setNaoEncontrado(false);
-
-//     try {
-//       if (categoria) {
-//         const resultado = await buscarVideosDaCategoria(categoria);
-//         if (resultado.length > 0) {
-//           setListaVideos(resultado);
-//         } else {
-//           setNaoEncontrado(true);
-//         }
-//       } else if (texto && texto.trim() !== "") {
-//         const resultado = await buscarVideo(decodeURIComponent(texto));
-//         if (resultado.encontrado) {
-//           setVideoUrl(resultado.url);
-//         } else {
-//           setNaoEncontrado(true);
-//         }
-//       }
-//     } catch {
-//       setNaoEncontrado(true);
-//     }
-
-//     setCarregando(false);
-//   };
-
-//   buscar();
-// }, [texto, categoria]);
-//     const handleProduzirNovamente = () => {
-//     navigate(`/traducao/${texto}`);
-//   };
-
-//   const handleVoltar = () => {
-//     navigate("/traducao");
-//   };
-
-//   return (
-//      <Flex
-//       minH="100vh"
-//       w="100%"
-//       bg="#F3F5FC"
-//       justify="center"
-//       align="center"
-//       p={4}
-//       direction='column'
-//     >
-//       <VStack
-//         spacing={6}
-//         bg="#6AB04C"
-//         p={6}
-//         borderRadius="lg"
-//         boxShadow="lg"
-//         w={{ base: "100%", md: "600px", lg: "700px" }}
-//       >
-//         {carregando && <Text>Buscando vídeo...</Text>}
-//         {naoEncontrado && <Text>Nenhum vídeo encontrado.</Text>}
-
-//        {videoUrl && (
-//   <Box w="100%">
-//     <video width="100%" controls>
-//       <source src={videoUrl} type="video/mp4" />
-//       Seu navegador não suporta vídeo.
-//     </video>
-//   </Box>
-// )}
-
-// {listaVideos.length > 0 && (
-//   <VStack spacing={4} w="100%">
-//     {listaVideos.map((video, index) => (
-//       <Box key={index} w="100%">
-//         <Text fontWeight="bold" color="white" mb={1}>
-//           {video.titulo}
-//         </Text>
-//         <video width="100%" controls>
-//           <source src={video.url} type="video/mp4" />
-//           Seu navegador não suporta vídeo.
-//         </video>
-//       </Box>
-//     ))}
-//   </VStack>
-// )}
-
-//         <Text fontSize="2xl" fontWeight="bold" color="#fff">
-//           {texto}
-//         </Text>
-
-//         <Text textAlign="center" color="#fff">
-//           Aqui está a tradução da palavra "<strong>{texto}</strong>" para Libras.
-//           Se desejar, você pode gerar novamente ou voltar para a tela inicial.
-//         </Text>
-//       </VStack>
-//         <Flex gap={4} wrap="wrap" mt='2rem'>
-//           <Button
-//             w='200px'
-//             bg="#6AB04C"
-//             color="white"
-//             borderRadius='15px'
-//             padding='24px'
-//             _hover={{ bg: "#579b3e" }}
-//             onClick={handleProduzirNovamente}
-//           >
-//             Produzir Novamente
-//           </Button>
-//           <Button
-//             w='200px'
-//             variant="outline"
-//             borderColor="#6AB04C"
-//             borderRadius='15px'
-//             padding='24px'
-//             color="#6AB04C"
-//             _hover={{ bg: "#e8f5e9" }}
-//             onClick={handleVoltar}
-//           >
-//             Voltar
-//           </Button>
-//         </Flex>
-//     </Flex>
-//   );
-// }
-
-
-
+import { useParams } from "react-router-dom";
 import { useEffect, useState } from "react";
-import {
-  Box,
-  Button,
-  Flex,
-  Text,
-  VStack,
-} from "@chakra-ui/react";
-import { buscarVideo, buscarVideosDaCategoria } from "../../services/api";
-import { useNavigate, useParams } from "react-router-dom";
+import { Flex, Text, Spinner, Image, Button } from "@chakra-ui/react";
+import { db } from "../../services/firebase";
+import { doc, getDoc } from "firebase/firestore";
+import { MenuUsuario } from "../../components/Menu/menu";
+import { RiCloseFill } from "react-icons/ri";
 
 export function VideoMostrar() {
-  const navigate = useNavigate();
-  const { texto, categoria } = useParams();
-
-  const [videoUrl, setVideoUrl] = useState("");
-  const [listaVideos, setListaVideos] = useState([]);
-  const [carregando, setCarregando] = useState(false);
-  const [naoEncontrado, setNaoEncontrado] = useState(false);
-
-  // const isMobile = useBreakpointValue({ base: true, md: false });
+  const { categoria } = useParams();
+  const [videos, setVideos] = useState([]);
+  const [carregando, setCarregando] = useState(true);
+  const [videoSelecionado, setVideoSelecionado] = useState(null);
+  // const navigate = useNavigate();
 
   useEffect(() => {
-    const buscar = async () => {
+    const buscarVideos = async () => {
       setCarregando(true);
-      setNaoEncontrado(false);
-
       try {
-        if (categoria) {
-          const resultado = await buscarVideosDaCategoria(categoria);
-          if (resultado.length > 0) {
-            setListaVideos(resultado);
-          } else {
-            setNaoEncontrado(true);
-          }
-        } else if (texto && texto.trim() !== "") {
-          const resultado = await buscarVideo(decodeURIComponent(texto));
-          if (resultado.encontrado) {
-            setVideoUrl(resultado.url);
-          } else {
-            setNaoEncontrado(true);
-          }
-        }
-      } catch {
-        setNaoEncontrado(true);
-      }
+        const docRef = doc(db, "videos", "libra");
+        const docSnap = await getDoc(docRef);
 
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          const todosVideos = Object.values(data);
+
+          const filtrados = todosVideos.filter(
+            (video) =>
+              video.categoria &&
+              video.categoria.toLowerCase() === categoria.toLowerCase()
+          );
+
+          setVideos(filtrados);
+        }
+      } catch (erro) {
+        console.error("Erro ao buscar vídeos:", erro);
+      }
       setCarregando(false);
     };
 
-    buscar();
-  }, [texto, categoria]);
+    buscarVideos();
+  }, [categoria]);
 
-  // const handleProduzirNovamente = () => {
-  //   navigate(`/traducao/${texto}`);
+  // const abrirVideo = (video) => {
+  //   setVideoSelecionado(video);
+  //   onOpen();
   // };
 
-  const handleVoltar = () => {
-    navigate("/traducao");
-  };
+  // const voltar = () => {
+  //   navigate(-1);
+  // };
 
-  console.log(buscarVideosDaCategoria(categoria))
-
-  return (
+ return (
+  <>
     <Flex
       minH="100vh"
       w="100%"
-      bg="#F3F5FC"
-      justify="center"
-      align="center"
-      p={4}
       direction="column"
+      align="center"
+      bg="#F3F5FC"
+      px={4}
+      py={6}
+      pt={{ base: "70px", md: "150px" }}
     >
-      <VStack
-        spacing={6}
-        bg="#6AB04C"
-        p={6}
-        borderRadius="lg"
-        boxShadow="lg"
-        w="100%"
-        maxW="700px"
-      >
-        {carregando && <Text color="white">Buscando vídeo...</Text>}
-        {naoEncontrado && <Text color="white">Nenhum vídeo encontrado.</Text>}
+      <MenuUsuario />
 
-        {videoUrl && (
-          <Box w="100%">
-            <video width="100%" controls>
-              <source src={videoUrl} type="video/mp4" />
+      <Flex w="100%" justify="center" mb={6}>
+        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold">
+          Vídeos da categoria: {categoria.toUpperCase()}
+        </Text>
+      </Flex>
+
+      {carregando ? (
+        <Spinner size="lg" color="#6AB04C" />
+      ) : videos.length === 0 ? (
+        <Text>Nenhum vídeo encontrado.</Text>
+      ) : (
+        <Flex
+          wrap="wrap"
+          justify="center"
+          gap={6}
+          w="100%"
+          maxW="1200px"
+        >
+          {videos.map((video, index) => (
+            <Flex
+              key={index}
+              direction="column"
+              bg="#fff"
+              border="1px solid #e2e8f0"
+              borderRadius="md"
+              boxShadow="md"
+              overflow="hidden"
+              w="100%"
+              maxW="250px"
+            >
+              <Image
+                src={video.thumbnail}
+                alt="Thumb do vídeo"
+                objectFit="cover"
+                w="100%"
+                h="150px"
+              />
+              <Flex direction="column" p={4}>
+                <Text
+                  fontWeight="bold"
+                  fontSize="md"
+                  mb={2}
+                  noOfLines={1}
+                >
+                  {video.titulo.toUpperCase()}
+                </Text>
+                <Button
+                  bg="#6AB04C"
+                  size="sm"
+                  color="white"
+                  _hover={{ bg: "#5CA13E" }}
+                  onClick={() => setVideoSelecionado(video)}
+                >
+                  Assistir vídeo
+                </Button>
+              </Flex>
+            </Flex>
+          ))}
+        </Flex>
+      )}
+
+      {videoSelecionado && (
+        <Flex
+          position="fixed"
+          top="0"
+          left="0"
+          w="100%"
+          h="100%"
+          bg="rgba(0,0,0,0.8)"
+          align="center"
+          justify="center"
+          p={4}
+          zIndex="999"
+        >
+          <Flex
+            direction="column"
+            bg="#fff"
+            borderRadius="md"
+            p={4}
+            w="100%"
+            maxW="600px"
+            maxH="90vh"
+            overflowY="auto"
+            align="center"
+          >
+            <Flex w="100%" justify="space-between" mb={4}>
+              <Text fontWeight="bold" fontSize="xl">
+                {videoSelecionado.titulo.toUpperCase()}
+              </Text>
+              <RiCloseFill
+                color="#6AB04C"
+                cursor="pointer"
+                size="30px"
+                onClick={() => setVideoSelecionado(null)}
+              />
+            </Flex>
+            <video
+              style={{
+                width: "100%",
+                height: "auto",
+                maxHeight: "70vh",
+                borderRadius: "8px",
+              }}
+              controls
+            >
+              <source src={videoSelecionado.url} type="video/mp4" />
               Seu navegador não suporta vídeo.
             </video>
-          </Box>
-        )}
-
-        {listaVideos.length > 0 && (
-          <VStack spacing={4} w="100%">
-            {listaVideos.map((video, index) => (
-              <Box key={index} w="100%">
-                <Text fontWeight="bold" color="white" mb={1}>
-                  {video.titulo}
-                </Text>
-                <video width="100%" controls>
-                  <source src={video.url} type="video/mp4" />
-                  Seu navegador não suporta vídeo.
-                </video>
-              </Box>
-            ))}
-          </VStack>
-        )}
-
-        <Text
-          fontSize={{ base: "xl", md: "2xl" }}
-          fontWeight="bold"
-          color="#fff"
-          textAlign="center"
-        >
-          {texto}
-        </Text>
-
-        <Text
-          textAlign="center"
-          color="#fff"
-          fontSize={{ base: "sm", md: "md" }}
-        >
-          Aqui está a palavra{" "}
-          <strong style={{ fontWeight: "bold" }}>{texto}</strong>
-        </Text>
-      </VStack>
-
-      <Flex
-        gap={4}
-        mt="2rem"
-        w="100%"
-        maxW="700px"
-        flexDirection={{ base: "column", md: "row" }}
-      >
-        <Button
-          w="100%"
-          variant="outline"
-          borderColor="#6AB04C"
-          borderRadius="15px"
-          py={6}
-          color="#6AB04C"
-          _hover={{ bg: "#e8f5e9" }}
-          onClick={handleVoltar}
-        >
-          Voltar
-        </Button>
-      </Flex>
+          </Flex>
+        </Flex>
+      )}
     </Flex>
-  );
+  </>
+);
 }

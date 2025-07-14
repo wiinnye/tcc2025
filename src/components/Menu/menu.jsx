@@ -41,16 +41,23 @@ export function MenuUsuario() {
   };
 
   return (
-    <Box
-      position="fixed"
-      top={0}
-      left={0}
-      right={0}
-      bg="#6AB04C"
-      boxShadow="sm"
-      zIndex="1000"
-    >
-      <Flex w='100%' justify="space-between" align="center" px={5} py={5}>
+<Box
+  position="fixed"
+  top={0}
+  left={0}
+  right={0}
+  bg="#6AB04C"
+  boxShadow="sm"
+  zIndex="1000"
+  h={{ base: "70px", md: "90px" }} // ← Altura clara!
+>
+  <Flex
+    w="100%"
+    h="100%"
+    justify="space-between"
+    align="center"
+    px={5}
+  >
         {carregando ? (
           <Spinner size="sm" color="white" />
         ) : usuario ? (
@@ -75,7 +82,7 @@ export function MenuUsuario() {
               </Text>
             </Box>
         </Flex>
-           <Flex justify='end' direction='column'>     
+          <Flex justify='end' direction='column'>     
             <Button size="50px"  bg="#6AB04C" fontSize={{sm:"18px", md:"24px", lg:"24px"}} onClick={handleLogout}>
                 Sair da conta
             </Button>

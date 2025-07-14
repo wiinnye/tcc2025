@@ -19,13 +19,15 @@ import { auth, db } from "../../services/firebase";
 
 
 export function Login() {
-  const [showCard, setShowCard] = useState(false);
+  
   const [emailValue, setEmailValue] = useState("");
   const [senhaValue, setSenhaValue] = useState("");
-  const [error, setError] = useState(false);
-  const [showSenha, setShowSenha] = useState(false);
   const [mensagem, setMensagem] = useState("");
   const [erroSenha, setErroSenha] = useState("");
+  const [error, setError] = useState(false);
+  const [showSenha, setShowSenha] = useState(false);
+  const [showCard, setShowCard] = useState(false);
+
   const navigate = useNavigate();
   const isMobile = useBreakpointValue({ base: true, md: false });
 

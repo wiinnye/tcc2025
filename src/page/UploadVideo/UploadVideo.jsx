@@ -29,8 +29,8 @@ export function UploadVideo() {
     setMensagem("");
 
     try {
-      const url = await uploadVideoToCloudinary(file);
-      await salvarVideoNoFirestore(titulo, url, nomeVideo);
+       const { videoUrl, thumbnailUrl } = await uploadVideoToCloudinary(file);
+        await salvarVideoNoFirestore(titulo, videoUrl, nomeVideo, thumbnailUrl);
 
       setMensagem("✅ Vídeo enviado com sucesso!");
       setTitulo("");
