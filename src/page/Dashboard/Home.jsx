@@ -23,8 +23,12 @@ export function Home() {
         if (docSnap.exists()) {
           const data = docSnap.data();
 
+          // 🚩 NOVO: acessa a lista diretamente
+          const listaVideos = data.lista || [];
+
           // Pega todas as categorias dos vídeos
-          const todasCategorias = Object.values(data).map(video => video.categoria);
+          const todasCategorias = listaVideos.map(video => video.categoria);
+          console.log("Categorias encontradas:", todasCategorias);
 
           // Remove duplicadas (ignorando maiúsculas/minúsculas)
           const categoriasMap = new Map();
@@ -35,7 +39,6 @@ export function Home() {
             }
           });
 
-          // Salva apenas os valores únicos (primeira ocorrência)
           const categoriasUnicas = Array.from(categoriasMap.values());
 
           setCategorias(categoriasUnicas);

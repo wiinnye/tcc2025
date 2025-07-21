@@ -1,5 +1,5 @@
 import { db } from "../services/firebase";
-import { doc, getDocs, getDoc, setDoc} from "firebase/firestore";
+import { doc, getDocs, getDoc, addDoc, collection} from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { auth } from "../services/firebase"; // seu firebase.js
 import { onAuthStateChanged } from "firebase/auth"
@@ -34,7 +34,6 @@ export async function buscarVideo(titulo) {
     throw erro;
   }
 }
-
 // 👉 BUSCAR vídeos da categoria (com nome e url)
 export async function buscarVideosDaCategoria(categoria) {
  try {
@@ -84,30 +83,29 @@ export async function buscarPorCategoria(categoria) {
 }
 
 // 👉 SALVAR vídeo (com nome e url)
-export async function salvarVideoNoFirestore(categoria, url, titulo, thumbnail) {
-  const docRef = doc(db, "videos", "libra"); // documento fixo chamado "libra"
-  const snapshot = await getDoc(docRef);
+export async function salvarVideoNoFirestore(categoria, videoUrl, nomeVideo, thumbnailUrl, interpreteId, interpreteEmail) {
+  await addDoc(collection(db, "videos_pendentes"), {
+    titulo: nomeVideo,
+    url: videoUrl,
+    categoria,
+    thumbnail: thumbnailUrl || null,
+    interpreteId,
+    interpreteEmail,
+    status: "pendente",
+    createdAt: new Date()
+  });
+}
 
-  const novoVideo = {
+export async function salvarVideoPendente(titulo, url, categoria, interpreteId, interpreteEmail) {
+  await addDoc(collection(db, "videos_pendentes"), {
     titulo,
     url,
     categoria,
-    thumbnail,
-  };
-
-  let novosDados = {};
-
-  if (snapshot.exists()) {
-    const dadosAnteriores = snapshot.data();
-    const novaChave = `video_${Object.keys(dadosAnteriores).length + 1}`;
-
-    novosDados[novaChave] = novoVideo;
-  } else {
-    // se for o primeiro vídeo
-    novosDados["video_1"] = novoVideo;
-  }
-
-  await setDoc(docRef, novosDados, { merge: true });
+    interpreteId,
+    interpreteEmail,
+    status: "pendente",
+    createdAt: new Date()
+  });
 }
 
 export function useAuth() {
