@@ -3,11 +3,13 @@ import {
   Flex,
   Text,
   Spinner,
+  Image
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { MenuUsuario } from "../../components/Menu/menu";
+import bannerPrincipal from '../../image/banner.png'
 
 export function Home() {
   const [categorias, setCategorias] = useState([]);
@@ -28,7 +30,6 @@ export function Home() {
 
           // Pega todas as categorias dos vídeos
           const todasCategorias = listaVideos.map(video => video.categoria);
-          console.log("Categorias encontradas:", todasCategorias);
 
           // Remove duplicadas (ignorando maiúsculas/minúsculas)
           const categoriasMap = new Map();
@@ -56,6 +57,7 @@ export function Home() {
   return (
     <>
       <MenuUsuario />
+      <Image src={bannerPrincipal} alt='Banner_FuntLibra' w='100%' maxH='50%'  fit="contain" mt='4rem' /> 
       <Flex
         h="100vh"
         direction={{ base: "column-reverse", lg: "row" }}
@@ -64,6 +66,7 @@ export function Home() {
         px={4}
         py={6}
       >
+        
         <Flex
           w="100%"
           h="100%"

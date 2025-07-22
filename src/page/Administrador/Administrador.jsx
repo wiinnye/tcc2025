@@ -12,6 +12,7 @@ import {
 import { MenuUsuario } from "../../components/Menu/menu";
 import { Notificacao } from "../../components/Notificacao/Notificacao";
 import { FaRegTrashAlt } from "react-icons/fa";
+import { RiCloseFill } from "react-icons/ri";
 
 export function Administrador() {
   const [pendentes, setPendentes] = useState([]);
@@ -19,6 +20,7 @@ export function Administrador() {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [mensagem, setMensagem] = useState("");
+  const [videoAberto, setVideoAberto] = useState(null); // Controle de qual vídeo está aberto
 
   useEffect(() => {
     const buscarPendentes = async () => {
@@ -77,8 +79,9 @@ export function Administrador() {
         }))
       );
 
-     setMensagem("Vídeo aprovado!");
-    setTimeout(() => setMensagem(""), 5000);
+      setMensagem("✅ Vídeo aprovado!");
+      setTimeout(() => setMensagem(""), 5000);
+      setVideoAberto(null);
     } catch (error) {
       console.error("Erro:", error);
     }
@@ -103,8 +106,9 @@ export function Administrador() {
         }))
       );
 
-    setMensagem("Vídeo recusado!");
-    setTimeout(() => setMensagem(""), 5000);
+      setMensagem("🚫 Vídeo recusado!");
+      setTimeout(() => setMensagem(""), 5000);
+      setVideoAberto(null);
     } catch (error) {
       console.error("Erro:", error);
     }
@@ -164,7 +168,10 @@ export function Administrador() {
                 <Button
                   colorScheme="gray"
                   mb={4}
-                  onClick={() => setCategoriaSelecionada(null)}
+                  onClick={() => {
+                    setCategoriaSelecionada(null);
+                    setVideoAberto(null);
+                  }}
                 >
                   Voltar
                 </Button>
@@ -195,37 +202,109 @@ export function Administrador() {
                           h="150px"
                         />
 
-                        <Flex
-                          w="100%"
-                          mt="1rem"
-                          px=".4rem"
-                          direction="column"
-                        >
+                        <Flex w="100%" mt="1rem" px=".4rem" direction="column">
                           <Text fontWeight="bold" fontSize="lg">
                             {v.titulo.toUpperCase()}
                           </Text>
-                          <Text fontWeight="bold" fontSize="sm" color="#b8c2ca">
-                            {v.categoria}
+                          <Text fontSize="sm" color="gray.500">
+                            Intérprete: {v.interprete || "Não informado"}
                           </Text>
-                        </Flex>
+                          <Text fontSize="sm" color="gray.500">
+                            Email: {v.email || "Não informado"}
+                          </Text>
 
-                        <Flex w="100%" align="center" justify="space-around" mt={4}>
                           <Button
-                            w="100px"
-                            bg="green"
+                            mt={2}
+                            size="sm"
+                            bg="#6AB04C"
                             color="white"
-                            onClick={() => aprovar(v)}
+                            onClick={() => setVideoAberto(v.id)}
                           >
-                            Aprovar
+                            Abrir Vídeo
                           </Button>
-                          <Button
-                            w="100px"
-                            bg="red"
-                            color="white"
-                            onClick={() => recusar(v)}
-                          >
-                            <FaRegTrashAlt />
-                          </Button>
+
+                          {videoAberto === v.id && (
+                            <Flex
+                              position="fixed"
+                              top="0"
+                              left="0"
+                              w="100%"
+                              h="100%"
+                              bg="rgba(0,0,0,0.8)"
+                              align="center"
+                              justify="center"
+                              p={4}
+                              zIndex="999"
+                            >
+                              <Flex
+                                direction="column"
+                                bg="#fff"
+                                borderRadius="md"
+                                p={4}
+                                w="100%"
+                                maxW="600px"
+                                maxH="90vh"
+                                overflowY="auto"
+                                align="center"
+                              >
+                              
+                                <Flex
+                                  w="100%"
+                                  justify="space-between"
+                                  mb={4}
+                                  flexDirection='column'
+                                  align='end'
+                                >
+                                <RiCloseFill
+                                  color="#6AB04C"
+                                  cursor="pointer"
+                                  size="30px"
+                                  mb='1rem'
+                                  onClick={() => setVideoAberto(null)}
+                                />
+                                <video
+                                  style={{
+                                    width: "100%",
+                                    height: "auto",
+                                    maxHeight: "100vh",
+                                    borderRadius: "8px",
+                                    marginTop: '1rem',
+                                  }}
+                                  controls
+                                >
+                                  <source
+                                    src={videoAberto.url}
+                                    type="video/mp4"
+                                  />
+                                  Seu navegador não suporta vídeo.
+                                </video>
+                              </Flex>
+                              <Flex
+                                w="100%"
+                                align="center"
+                                justify="space-around"
+                                mt={4}
+                              >
+                                <Button
+                                  w="20%"
+                                  bg="green"
+                                  color="white"
+                                  onClick={() => aprovar(v)}
+                                >
+                                  Aprovar
+                                </Button>
+                                <Button
+                                  w="20%"
+                                  bg="red"
+                                  color="white"
+                                  onClick={() => recusar(v)}
+                                >
+                                  <FaRegTrashAlt />
+                                </Button>
+                              </Flex>
+                              </Flex>
+                            </Flex>
+                          )}
                         </Flex>
                       </Flex>
                     ))}
@@ -235,7 +314,7 @@ export function Administrador() {
           </>
         )}
       </Flex>
-       {mensagem && (
+      {mensagem && (
         <Notificacao mensagem={mensagem} onClose={() => setMensagem("")} />
       )}
     </>
