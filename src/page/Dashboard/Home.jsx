@@ -55,11 +55,11 @@ export function Home() {
   }, []);
 
   return (
-    <>
+    <Flex w='100%' h="100vh" direction='column' pt={{ base: "70px", md: "90px",lg:'100px' }} >
       <MenuUsuario />
-      <Image src={bannerPrincipal} alt='Banner_FuntLibra' w='100%' maxH='50%'  fit="contain" mt='4rem' /> 
+      {/* BANNER */}
+      <Image src={bannerPrincipal} alt='Banner_FuntLibra' w='100%' fit='contain' /> 
       <Flex
-        h="100vh"
         direction={{ base: "column-reverse", lg: "row" }}
         justify="center"
         align="center"
@@ -105,6 +105,6 @@ export function Home() {
           )}
         </Flex>
       </Flex>
-    </>
+    </Flex>
   );
 }

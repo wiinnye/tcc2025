@@ -86,10 +86,8 @@ const handleUpload = async () => {
 };
 
   return (
-    <Flex  w="100%" h='100vh'>
-    
+    <Flex  w="100%" h='100vh' pt={{ base: "70px", md: "90px",lg:'100px' }}>
       <MenuUsuario/>
-
     <Flex
       direction="column"
       p={6}

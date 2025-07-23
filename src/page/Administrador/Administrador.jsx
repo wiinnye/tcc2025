@@ -115,7 +115,7 @@ export function Administrador() {
   };
 
   return (
-    <>
+    <Flex pt={{ base: "70px", md: "90px",lg:'100px' }}>
       <MenuUsuario />
       <Flex
         minH="100vh"
@@ -317,6 +317,6 @@ export function Administrador() {
       {mensagem && (
         <Notificacao mensagem={mensagem} onClose={() => setMensagem("")} />
       )}
-    </>
+    </Flex>
   );
 }

@@ -46,13 +46,13 @@ export function MenuUsuario() {
 
   return (
     <Box
-      // position="fixed"
+      position="fixed"
       top={0}
       left={0}
       right={0}
       bg="#4cb04c"
       boxShadow="sm"
-      // zIndex="900"
+      zIndex="900"
       h={{ base: "70px", md: "90px" }}
     >
       {carregando ? (
