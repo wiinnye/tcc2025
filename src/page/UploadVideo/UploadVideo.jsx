@@ -5,12 +5,14 @@ import {
   Flex,
   Input,
   Text,
+  Image,
   useBreakpointValue,
 } from "@chakra-ui/react";
 import { uploadVideoToCloudinary } from "../../services/cloudinaryService";
 import { salvarVideoNoFirestore } from "../../services/api";
 import { MenuUsuario } from "../../components/Menu/menu";
 import { getAuth } from "firebase/auth";
+import bgFuntlibra from "../../image/bgFuntlibra.png";
 
 export function UploadVideo() {
   const [titulo, setTitulo] = useState("");       // Categoria (ex: html)
@@ -86,34 +88,59 @@ const handleUpload = async () => {
 };
 
   return (
-    <Flex  w="100%" h='100vh' pt={{ base: "70px", md: "90px",lg:'100px' }}>
+    <Flex  w="100%" pt={{ base: "70px", md: "90px",lg:'100px' }}>
       <MenuUsuario/>
-    <Flex
-      direction="column"
-      p={6}
-      bg="gray.50"
-      borderRadius="md"
-      shadow="md"
-      w="100%"
-      maxW={{ base: "100%", md: "480px" }}
-      mx="auto"
-      mt='5rem'
-      align='center'
-      justify='center'
+        {isMobile && (
+                <Box
+                  position="absolute"
+                  top={0}
+                  left={0}
+                  w="100vw"
+                  h="100vh"
+                  backgroundImage={`url(${bgFuntlibra})`}
+                  backgroundSize="cover"
+                  backgroundPosition="center"
+                  zIndex={0}
+                />
+          )}
+    <Flex 
+    w={{base:"100%", lg:"50%"}} 
+    h="100%" 
+    alignItems={"center"} 
+    flexDirection="column" 
+    position="relative" 
+    zIndex={1}
+    pt={{ base: "70px", md: "90px",lg:'80px' }}
     >
-    
-      <Text
-        fontSize={{ base: "lg", md: "xl" }}
-        mb={4}
-        fontWeight="bold"
-        color="blue.700"
-        textAlign="center"
-      >
-        Cadastro de Vídeo - Intérprete Libras
-      </Text>
+        <Flex 
+        w={{ base: "300px", s: "150px", md: "350px", lg: "500px" }}
+          h="500px"
+          alignItems={"center"}
+          alignContent={"center"}
+          justify={"center"}
+          flexDirection="column"
+          bg={"#F3F5FC"}
+          borderRadius={"25px"}
+          boxShadow="3px 2px 2px 4px #e8eaf3"
+          >
+           <Flex
+                  w={{ base: "300px", s: "150px", md: "350px", lg: "500px" }}
+                  flexDirection="column"
+                >
+                  <Text
+                    fontSize="21px"
+                    padding={{ lg: "1rem" }}
+                    textAlign="center"
+                    color="#000"
+                    fontWeight="bold"
+                  >
+                    Cadastro de Vídeo
+                  </Text>
+                </Flex>
 
       <Input
-        placeholder="Categoria (ex.: html)"
+        placeholder="Nome da Linguaguem (ex.: html)"
+        w={{ base: "200px", md: "250px", lg: "350px" }}
         mb={3}
         value={titulo}
         onChange={(e) => setTitulo(e.target.value)}
@@ -121,7 +148,8 @@ const handleUpload = async () => {
       />
 
       <Input
-        placeholder="Nome descritivo do vídeo"
+        placeholder="Nome de termo"
+        w={{ base: "200px", md: "250px", lg: "350px" }}
         mb={3}
         value={nomeVideo}
         onChange={(e) => setNomeVideo(e.target.value)}
@@ -131,17 +159,20 @@ const handleUpload = async () => {
       <Input
         type="file"
         accept="video/*"
+        w={{ base: "200px", md: "250px", lg: "350px" }}
         mb={3}
         onChange={(e) => setFile(e.target.files[0])}
         size={isMobile ? "md" : "lg"}
       />
 
       <Button
-        colorScheme="blue"
+        w={{ base: "200px", md: "250px", lg: "350px" }}
+        mb="1rem"
+        bg={"#6AB04C"}
+        color="#fff"
         onClick={handleUpload}
         isLoading={carregando}
         loadingText="Enviando..."
-        mb={3}
         size={isMobile ? "md" : "lg"}
       >
         Enviar vídeo
@@ -159,7 +190,13 @@ const handleUpload = async () => {
           {mensagem}
         </Box>
       )}
+      </Flex>
     </Flex>
+     {!isMobile && (
+            <Flex w="50%">
+              <Image w="1000px" h="100vh" src={bgFuntlibra}></Image>
+            </Flex>
+          )}
         </Flex>
   );
 }
