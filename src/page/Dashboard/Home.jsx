@@ -10,6 +10,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { MenuUsuario } from "../../components/Menu/menu";
 import bannerPrincipal from '../../image/banner.png'
+import { Footer } from "../../components/Footer/Footer";
 
 export function Home() {
   const [categorias, setCategorias] = useState([]);
@@ -105,6 +106,7 @@ export function Home() {
           )}
         </Flex>
       </Flex>
+      <Footer/>
     </Flex>
   );
 }
