@@ -9,6 +9,8 @@ import {
 } from "@chakra-ui/react";
 import { uploadVideoToCloudinary } from "../../services/cloudinaryService";
 import { salvarVideoNoFirestore } from "../../services/api";
+import { MenuUsuario } from "../../components/Menu/menu";
+import { getAuth } from "firebase/auth";
 
 export function UploadVideo() {
   const [titulo, setTitulo] = useState("");       // Categoria (ex: html)
@@ -19,32 +21,73 @@ export function UploadVideo() {
 
   const isMobile = useBreakpointValue({ base: true, md: false });
 
-  const handleUpload = async () => {
-    if (!titulo.trim() || !nomeVideo.trim() || !file) {
-      setMensagem("⚠️ Preencha todos os campos e selecione um vídeo.");
-      return;
+  // const handleUpload = async () => {
+  //   if (!titulo.trim() || !nomeVideo.trim() || !file) {
+  //     setMensagem("⚠️ Preencha todos os campos e selecione um vídeo.");
+  //     return;
+  //   }
+
+  //   setCarregando(true);
+  //   setMensagem("");
+
+  //   try {
+  //      const { videoUrl, thumbnailUrl } = await uploadVideoToCloudinary(file);
+  //       await salvarVideoNoFirestore(titulo, videoUrl, nomeVideo, thumbnailUrl);
+
+  //     setMensagem("✅ Vídeo enviado com sucesso!");
+  //     setTitulo("");
+  //     setNomeVideo("");
+  //     setFile(null);
+  //   } catch (error) {
+  //     console.error("Erro no upload:", error);
+  //     setMensagem("❌ Erro ao enviar o vídeo.");
+  //   }
+
+  //   setCarregando(false);
+  // };
+const handleUpload = async () => {
+  if (!titulo.trim() || !nomeVideo.trim() || !file) {
+    setMensagem("⚠️ Preencha todos os campos e selecione um vídeo.");
+    return;
+  }
+
+  setCarregando(true);
+  setMensagem("");
+
+  try {
+    const { videoUrl, thumbnailUrl } = await uploadVideoToCloudinary(file);
+
+    const auth = getAuth();
+    const user = auth.currentUser;
+
+    if (!user) {
+      throw new Error("Usuário não está logado!");
     }
 
-    setCarregando(true);
-    setMensagem("");
+    await salvarVideoNoFirestore(
+      titulo,
+      videoUrl,
+      nomeVideo,
+      thumbnailUrl,
+      user.uid,
+      user.email // pega o email do interprete logado
+    );
 
-    try {
-       const { videoUrl, thumbnailUrl } = await uploadVideoToCloudinary(file);
-        await salvarVideoNoFirestore(titulo, videoUrl, nomeVideo, thumbnailUrl);
+    setMensagem("✅ Vídeo enviado para aprovação do administrador!");
+    setTitulo("");
+    setNomeVideo("");
+    setFile(null);
+  } catch (error) {
+    console.error("Erro no upload:", error);
+    setMensagem("❌ Erro ao enviar o vídeo.");
+  }
 
-      setMensagem("✅ Vídeo enviado com sucesso!");
-      setTitulo("");
-      setNomeVideo("");
-      setFile(null);
-    } catch (error) {
-      console.error("Erro no upload:", error);
-      setMensagem("❌ Erro ao enviar o vídeo.");
-    }
-
-    setCarregando(false);
-  };
+  setCarregando(false);
+};
 
   return (
+    <Flex  w="100%" h='100vh' pt={{ base: "70px", md: "90px",lg:'100px' }}>
+      <MenuUsuario/>
     <Flex
       direction="column"
       p={6}
@@ -54,8 +97,11 @@ export function UploadVideo() {
       w="100%"
       maxW={{ base: "100%", md: "480px" }}
       mx="auto"
-      mt={8}
+      mt='5rem'
+      align='center'
+      justify='center'
     >
+    
       <Text
         fontSize={{ base: "lg", md: "xl" }}
         mb={4}
@@ -114,5 +160,6 @@ export function UploadVideo() {
         </Box>
       )}
     </Flex>
+        </Flex>
   );
 }

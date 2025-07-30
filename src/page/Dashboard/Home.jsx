@@ -3,11 +3,13 @@ import {
   Flex,
   Text,
   Spinner,
+  Image
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { MenuUsuario } from "../../components/Menu/menu";
+import bannerPrincipal from '../../image/banner.png'
 
 export function Home() {
   const [categorias, setCategorias] = useState([]);
@@ -23,8 +25,11 @@ export function Home() {
         if (docSnap.exists()) {
           const data = docSnap.data();
 
+          // 🚩 NOVO: acessa a lista diretamente
+          const listaVideos = data.lista || [];
+
           // Pega todas as categorias dos vídeos
-          const todasCategorias = Object.values(data).map(video => video.categoria);
+          const todasCategorias = listaVideos.map(video => video.categoria);
 
           // Remove duplicadas (ignorando maiúsculas/minúsculas)
           const categoriasMap = new Map();
@@ -35,7 +40,6 @@ export function Home() {
             }
           });
 
-          // Salva apenas os valores únicos (primeira ocorrência)
           const categoriasUnicas = Array.from(categoriasMap.values());
 
           setCategorias(categoriasUnicas);
@@ -51,16 +55,18 @@ export function Home() {
   }, []);
 
   return (
-    <>
+    <Flex w='100%' h="100vh" direction='column' pt={{ base: "70px", md: "90px",lg:'100px' }} >
       <MenuUsuario />
+      {/* BANNER */}
+      <Image src={bannerPrincipal} alt='Banner_FuntLibra' w='100%' fit='contain' /> 
       <Flex
-        h="100vh"
         direction={{ base: "column-reverse", lg: "row" }}
         justify="center"
         align="center"
         px={4}
         py={6}
       >
+        
         <Flex
           w="100%"
           h="100%"
@@ -99,6 +105,6 @@ export function Home() {
           )}
         </Flex>
       </Flex>
-    </>
+    </Flex>
   );
 }

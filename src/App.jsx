@@ -8,7 +8,7 @@ import { CadastroUsuario } from "./page/CadastroUsuario/cadastroUsuario";
 import { RecuperarSenha } from "./page/RecuperarSenha/recuperarSenha";
 import { VideoMostrar } from "./page/VideoMostrar/videoMostrar";
 import { UploadVideo } from "./page/UploadVideo/UploadVideo";
-
+import { Administrador } from "./page/Administrador/Administrador";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase"; // ajuste o caminho se for diferente
@@ -30,7 +30,7 @@ export default function App() {
   }
 
   return (
-    <Flex className="containerMain">
+    // <Flex className="containerMain">
       <BrowserRouter>
         <Routes>
           {!usuario ? (
@@ -49,12 +49,13 @@ export default function App() {
               <Route path="/traducao/categoria/:categoria" element={<VideoMostrar />} />
               <Route path="/uploadVideo" element={<UploadVideo />} />
               <Route path="/recuperarSenha" element={<RecuperarSenha />} />
+              <Route path="/administrador" element={<Administrador />} />
               {/* Se não encontrar rota, leva para dashboard */}
               <Route path="*" element={<Home />} />
             </>
           )}
         </Routes>
       </BrowserRouter>
-    </Flex>
+    // </Flex>
   );
 }

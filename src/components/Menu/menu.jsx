@@ -1,4 +1,4 @@
-import { Box, Flex, Text, Spinner, Button } from "@chakra-ui/react";
+import { Box, Flex, Text, Spinner } from "@chakra-ui/react";
 import { FaUserCircle } from "react-icons/fa";
 import { useEffect, useState } from "react";
 import { getAuth, signOut } from "firebase/auth";
@@ -40,61 +40,115 @@ export function MenuUsuario() {
     navigate("/"); // redireciona para a página inicial ou login
   };
 
+  const UploadPage = () => {
+    navigate("/uploadVideo");
+  };
+
   return (
-<Box
-  position="fixed"
-  top={0}
-  left={0}
-  right={0}
-  bg="#6AB04C"
-  boxShadow="sm"
-  zIndex="1000"
-  h={{ base: "70px", md: "90px" }} // ← Altura clara!
->
-  <Flex
-    w="100%"
-    h="100%"
-    justify="space-between"
-    align="center"
-    px={5}
-  >
-        {carregando ? (
-          <Spinner size="sm" color="white" />
-        ) : usuario ? (
-          <>
-          <Flex align="center" gap={3}>
-            <Flex
-              align="center"
-              justify="center"
-              bg="gray.300"
-              borderRadius="full"
-              w={{sm:"32px", md:"50px", lg:"60px"}}
-              h={{sm:"32px", md:"50px", lg:"60px"}}
-            >
-              <FaUserCircle size='40' color="white" />
+    <Box
+      position="fixed"
+      top={0}
+      left={0}
+      right={0}
+      bg="#4cb04c"
+      boxShadow="sm"
+      zIndex="900"
+      h={{ base: "70px", md: "90px" }}
+    >
+      {carregando ? (
+        <Spinner size="sm" color="white" />
+      ) : usuario ? (
+        <>
+          <Flex w="100%" h="100%" justify="space-between" p={5} align="center">
+            <Flex align="center" gap={3}>
+              <Flex
+                align="center"
+                justify="center"
+                bg="gray.300"
+                borderRadius="full"
+                w={{ sm: "32px", md: "50px", lg: "60px" }}
+                h={{ sm: "32px", md: "50px", lg: "60px" }}
+              >
+                <FaUserCircle size="40" color="white" />
+              </Flex>
+              <Box textAlign="left" color="white">
+                <Text
+                  fontSize={{ sm: "18px", md: "24px", lg: "24px" }}
+                  fontWeight="bold"
+                  wrap="wrap"
+                >
+                  {usuario.nome || "Usuário"}
+                </Text>
+                <Text fontSize="md" color="#FFCCCC">
+                  {usuario.tipo === "interprete"
+                    ? "Intérprete"
+                    : usuario.tipo === "adm"
+                    ? "Administrador"
+                    : "Aluno"}
+                </Text>
+              </Box>
             </Flex>
-            <Box textAlign="left" color="white">
-              <Text fontSize={{sm:"18px", md:"24px", lg:"24px"}} fontWeight="bold" wrap='wrap' >
-                {usuario.nome || "Usuário"}
-              </Text>
-              <Text fontSize="md" color='#FFCCCC'>
-                {usuario.tipo === "interprete" ? "Intérprete" : "Aluno"}
-              </Text>
-            </Box>
-        </Flex>
-          <Flex justify='end' direction='column'>     
-            <Button size="50px"  bg="#6AB04C" fontSize={{sm:"18px", md:"24px", lg:"24px"}} onClick={handleLogout}>
+            <Flex justify="end" direction="column">
+              <Text
+                cursor="pointer"
+                color="#fff"
+                fontSize={{ sm: "18px", md: "24px", lg: "24px" }}
+                onClick={handleLogout}
+              >
                 Sair da conta
-            </Button>
+              </Text>
+            </Flex>
           </Flex>
+          {usuario.tipo !== "aluno" && (
+            <Flex
+              w="100%"
+              h="40%"
+              bg="#FFCCCC"
+              align="center"
+              justify="space-between"
+              p="1rem"
+            >
+              <Text
+                cursor="pointer"
+                color="#000"
+                fontWeight="bold"
+                fontSize="18px"
+                pl="1rem"
+                onClick={() => navigate("/tradutor")}
+              >
+                Home
+              </Text>
+              <Text
+                cursor="pointer"
+                color="#000"
+                fontWeight="bold"
+                fontSize="18px"
+                pl="1rem"
+                onClick={UploadPage}
+              >
+                Novo Upload
+              </Text>
+
+              {usuario.tipo === "adm" && (
+                <Text
+                  cursor="pointer"
+                  color="#000"
+                  fontWeight="bold"
+                  fontSize="18px"
+                  pl="1rem"
+                  onClick={() => navigate("/administrador")}
+                >
+                  Videos Pendentes
+                </Text>
+              )}
+            </Flex>
+          )}
         </>
-        ) : (
-          <Text fontSize="sm" color="gray.100">
-            Usuário não encontrado
-          </Text>
-        )}
-      </Flex>
-      
+      ) : (
+        <Text fontSize="sm" color="gray.100">
+          Usuário não encontrado
+        </Text>
+      )}
     </Box>
   );
 }
