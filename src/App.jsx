@@ -1,4 +1,4 @@
-import { Flex } from "@chakra-ui/react";
+import { Spinner, Stack } from "@chakra-ui/react";
 import "./services/styles/global.css"
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Login } from "./page/login/Login";
@@ -11,7 +11,8 @@ import { UploadVideo } from "./page/UploadVideo/UploadVideo";
 import { Administrador } from "./page/Administrador/Administrador";
 import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
-import { auth } from "./services/firebase"; // ajuste o caminho se for diferente
+import { auth } from "./services/firebase"; 
+import { Categorias } from "./page/Categorias/Categorias";
 
 export default function App() {
   const [usuario, setUsuario] = useState(null);
@@ -26,7 +27,7 @@ export default function App() {
     return () => unsubscribe();
   }, []);
   if (carregando) {
-    return <p>Carregando...</p>;
+    return <Stack direction='row' spacing={4}> <Spinner size='xl' /></Stack>
   }
 
   return (
@@ -45,11 +46,13 @@ export default function App() {
           ) : (
             <>
               <Route path="/" element={<Home />} />
-              <Route path="/traducao" element={<Home />} />
+              {/* <Route path="/traducao" element={<Home />} /> */}
               <Route path="/traducao/categoria/:categoria" element={<VideoMostrar />} />
               <Route path="/uploadVideo" element={<UploadVideo />} />
               <Route path="/recuperarSenha" element={<RecuperarSenha />} />
               <Route path="/administrador" element={<Administrador />} />
+              <Route path="/categorias" element={<Categorias />} />
+
               {/* Se não encontrar rota, leva para dashboard */}
               <Route path="*" element={<Home />} />
             </>
