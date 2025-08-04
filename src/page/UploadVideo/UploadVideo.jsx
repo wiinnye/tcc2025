@@ -88,7 +88,7 @@ export function UploadVideo() {
   };
 
   return (
-    <Flex w="100%" pt={{ base: "70px", md: "90px", lg: "100px" }}>
+    <Flex minH='100vh'>
       <MenuUsuario />
       {isMobile && (
         <Box
@@ -105,17 +105,18 @@ export function UploadVideo() {
       )}
       <Flex
         w={{ base: "100%", lg: "50%" }}
-        h="100%"
+        h="100vh"
         alignItems={"center"}
+        justify='center'
         flexDirection="column"
         position="relative"
         zIndex={1}
-        pt={{ base: "70px", md: "90px", lg: "80px" }}
+        pt={{ base: "70px", md: "90px", lg: "120px" }}
       >
         <Flex
           w={{ base: "300px", s: "150px", md: "350px", lg: "500px" }}
           h="500px"
-          alignItems={"center"}
+          align={"center"}
           alignContent={"center"}
           justify={"center"}
           flexDirection="column"

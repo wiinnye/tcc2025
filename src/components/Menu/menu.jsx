@@ -1,5 +1,16 @@
-import { Box, Flex, Text, Spinner } from "@chakra-ui/react";
+import {
+  Box,
+  Flex,
+  Text,
+  Spinner,
+  Button,
+  CloseButton,
+  Drawer,
+  Portal,
+  useBreakpointValue,
+} from "@chakra-ui/react";
 import { FaUserCircle } from "react-icons/fa";
+import { RiMenuFill } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { getAuth, signOut } from "firebase/auth";
 import { getDoc, doc } from "firebase/firestore";
@@ -9,7 +20,9 @@ import { useNavigate } from "react-router-dom";
 export function MenuUsuario() {
   const [usuario, setUsuario] = useState(null);
   const [carregando, setCarregando] = useState(true);
+  const [open, setOpen] = useState(false);
   const navigate = useNavigate();
+  const isMobile = useBreakpointValue({ base: true, md: false });
 
   useEffect(() => {
     const buscarUsuario = async () => {
@@ -45,12 +58,13 @@ export function MenuUsuario() {
   };
 
   return (
-    <Box
+    <Flex
       position="fixed"
       top={0}
       left={0}
       right={0}
       bg="#4cb04c"
+      direction='column'
       boxShadow="sm"
       zIndex="900"
       h={{ base: "70px", md: "90px" }}
@@ -99,56 +113,114 @@ export function MenuUsuario() {
               </Text>
             </Flex>
           </Flex>
-          {usuario.tipo !== "aluno" && (
-            <Flex
-              w="100%"
-              h="40%"
-              bg="#FFCCCC"
-              align="center"
-              justify="space-between"
-              p="1rem"
-            >
-              <Text
-                cursor="pointer"
-                color="#000"
-                fontWeight="bold"
-                fontSize="18px"
-                pl="1rem"
-                onClick={() => navigate("/tradutor")}
+          {usuario.tipo !== "aluno" &&
+            (!isMobile ? (
+              <Flex
+                w="100%"
+                h="40%"
+                bg="#FFCCCC"
+                align="center"
+                justify="space-around"
+                p="1rem"
               >
-                Home
-              </Text>
-              <Text
-                cursor="pointer"
-                color="#000"
-                fontWeight="bold"
-                fontSize="18px"
-                pl="1rem"
-                onClick={UploadPage}
-              >
-                Novo Upload
-              </Text>
-
-              {usuario.tipo === "adm" && (
                 <Text
                   cursor="pointer"
                   color="#000"
                   fontWeight="bold"
                   fontSize="18px"
                   pl="1rem"
-                  onClick={() => navigate("/administrador")}
+                  onClick={() => navigate("/tradutor")}
                 >
-                  Videos Pendentes
+                  Início
                 </Text>
-              )}
-            </Flex>
-          )}
+                <Text
+                  cursor="pointer"
+                  color="#000"
+                  fontWeight="bold"
+                  fontSize="18px"
+                  pl="1rem"
+                  onClick={UploadPage}
+                >
+                  Novo Cadastro Vídeo
+                </Text>
+
+                {usuario.tipo === "adm" && (
+                  <Text
+                    cursor="pointer"
+                    color="#000"
+                    fontWeight="bold"
+                    fontSize="18px"
+                    pl="1rem"
+                    onClick={() => navigate("/administrador")}
+                  >
+                    Videos Pendentes
+                  </Text>
+                )}
+              </Flex>
+            ) : (
+              <Flex w="100%" h="50%" bg="#FFCCCC">
+                <Drawer.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
+                  <Drawer.Trigger asChild>
+                    <Button bg='#FFCCCC' size="sm">
+                      <RiMenuFill />
+                    </Button>
+                  </Drawer.Trigger>
+                  <Portal>
+                    <Drawer.Backdrop />
+                    <Drawer.Positioner>
+                      <Drawer.Content>
+                        <Drawer.Body pt='3rem'>
+                          <Text
+                            cursor="pointer"
+                            color="#000"
+                            fontWeight="bold"
+                            fontSize="18px"
+                            pl="1rem"
+                            onClick={() => navigate("/tradutor")}
+                          >
+                            Início
+                          </Text>
+                          <Text
+                            cursor="pointer"
+                            color="#000"
+                            fontWeight="bold"
+                            fontSize="18px"
+                            pl="1rem"
+                            mt='.5rem'
+                            onClick={UploadPage}
+                          >
+                            Novo Cadastro Vídeo
+                          </Text>
+
+                          {usuario.tipo === "adm" && (
+                            <Text
+                              cursor="pointer"
+                              color="#000"
+                              fontWeight="bold"
+                              fontSize="18px"
+                              pl="1rem"
+                              mt='.5rem'
+                              onClick={() => navigate("/administrador")}
+                            >
+                              Videos Pendentes
+                            </Text>
+                          )}
+                        </Drawer.Body>
+                        <Drawer.CloseTrigger asChild>
+                          <CloseButton size="sm" />
+                        </Drawer.CloseTrigger>
+                      </Drawer.Content>
+                    </Drawer.Positioner>
+                  </Portal>
+                </Drawer.Root>
+              </Flex>
+            ))}
         </>
       ) : (
         <Text fontSize="sm" color="gray.100">
           Usuário não encontrado
         </Text>
       )}
-    </Box>
+    </Flex>
   );
 }

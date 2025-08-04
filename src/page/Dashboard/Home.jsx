@@ -7,14 +7,14 @@ import { CardCategoria } from "../../components/CardCategoria/CardCategoria";
 export function Home() {
 
   return (
+    <Flex minH="100vh" >
+    <MenuUsuario />
     <Flex
       w="100%"
-      minH="100vh"
       direction="column"
-      pt={{ base: "70px", md: "90px", lg: "100px" }}
+      pt={{ base: "100px", md: "90px", lg: "100px" }}
       align='center'
     >
-      <MenuUsuario />
       {/* BANNER */}
       <Image
         src={bannerPrincipal}
@@ -25,5 +25,6 @@ export function Home() {
       <CardCategoria/>
       <Footer />
     </Flex>
+  </Flex>
   );
 }
