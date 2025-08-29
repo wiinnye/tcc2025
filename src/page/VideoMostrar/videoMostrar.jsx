@@ -1,10 +1,11 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Flex, Text, Spinner, Image, Button } from "@chakra-ui/react";
+import { Flex, Text, Image, Button } from "@chakra-ui/react";
 import { db } from "../../services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { MenuUsuario } from "../../components/Menu/menu";
 import { RiCloseFill, RiArrowLeftLine  } from "react-icons/ri";
+import { SpinnerPage } from "../../components/Spinner/Spinner";
 
 export function VideoMostrar() {
   const { categoria } = useParams();
@@ -76,7 +77,7 @@ export function VideoMostrar() {
         </Flex>
 
         {carregando ? (
-          <Spinner size="lg" color="#6AB04C" />
+          <SpinnerPage />
         ) : videos.length === 0 ? (
           <Text>Nenhum vídeo encontrado.</Text>
         ) : (

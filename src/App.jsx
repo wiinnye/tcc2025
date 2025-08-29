@@ -13,6 +13,7 @@ import { useEffect, useState } from "react";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase"; 
 import { Categorias } from "./page/Categorias/Categorias";
+import { QueSomos } from "./page/QueSomos/QueSomos";
 
 export default function App() {
   const [usuario, setUsuario] = useState(null);
@@ -52,6 +53,7 @@ export default function App() {
               <Route path="/recuperarSenha" element={<RecuperarSenha />} />
               <Route path="/administrador" element={<Administrador />} />
               <Route path="/categorias" element={<Categorias />} />
+              <Route path="/queSomos" element={<QueSomos />} />
 
               {/* Se não encontrar rota, leva para dashboard */}
               <Route path="*" element={<Home />} />

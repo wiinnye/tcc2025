@@ -2,7 +2,6 @@ import {
   Box,
   Flex,
   Text,
-  Spinner,
   Button,
   CloseButton,
   Drawer,
@@ -16,6 +15,7 @@ import { getAuth, signOut } from "firebase/auth";
 import { getDoc, doc } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { useNavigate } from "react-router-dom";
+import { SpinnerPage } from "../Spinner/Spinner";
 
 export function MenuUsuario() {
   const [usuario, setUsuario] = useState(null);
@@ -70,7 +70,7 @@ export function MenuUsuario() {
       h={{ base: "70px", md: "90px" }}
     >
       {carregando ? (
-        <Spinner size="sm" color="white" />
+        <SpinnerPage />
       ) : usuario ? (
         <>
           <Flex w="100%" h="100%" justify="space-between" p={5} align="center">

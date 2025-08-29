@@ -5,6 +5,7 @@ import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { MenuUsuario } from "../../components/Menu/menu";
 import bgCategoria from "../../image/bgCategoria.png"
+import { SpinnerPage } from "../../components/Spinner/Spinner";
 
 export function Categorias() {
   const [categorias, setCategorias] = useState([]);
@@ -66,7 +67,7 @@ export function Categorias() {
         align="center"
       >
           {carregando ? (
-            <Spinner size="lg" color="#6AB04C" />
+            <SpinnerPage />
           ) : (
             <Flex w='100%' h='100vh'  justify="center" align='center' gap="1rem" mt="2rem" wrap="wrap">
               {categorias.map((categoria, index) => (
