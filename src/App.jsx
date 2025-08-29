@@ -14,6 +14,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./services/firebase"; 
 import { Categorias } from "./page/Categorias/Categorias";
 import { QueSomos } from "./page/QueSomos/QueSomos";
+import { CadastroAdm } from "./page/CadastroAdm/cadastroAdm";
 
 export default function App() {
   const [usuario, setUsuario] = useState(null);
@@ -48,6 +49,7 @@ export default function App() {
             <>
               <Route path="/" element={<Home />} />
               {/* <Route path="/traducao" element={<Home />} /> */}
+              <Route path="/cadastroAdministrador" element={<CadastroAdm />} />
               <Route path="/traducao/categoria/:categoria" element={<VideoMostrar />} />
               <Route path="/uploadVideo" element={<UploadVideo />} />
               <Route path="/recuperarSenha" element={<RecuperarSenha />} />

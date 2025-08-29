@@ -64,7 +64,7 @@ export function MenuUsuario() {
       left={0}
       right={0}
       bg="#4cb04c"
-      direction='column'
+      direction="column"
       boxShadow="sm"
       zIndex="900"
       h={{ base: "70px", md: "90px" }}
@@ -145,23 +145,35 @@ export function MenuUsuario() {
                 </Text>
 
                 {usuario.tipo === "adm" && (
-                  <Text
-                    cursor="pointer"
-                    color="#000"
-                    fontWeight="bold"
-                    fontSize="18px"
-                    pl="1rem"
-                    onClick={() => navigate("/administrador")}
-                  >
-                    Videos Pendentes
-                  </Text>
+                  <>
+                    <Text
+                      cursor="pointer"
+                      color="#000"
+                      fontWeight="bold"
+                      fontSize="18px"
+                      pl="1rem"
+                      onClick={() => navigate("/administrador")}
+                    >
+                      Videos Pendentes
+                    </Text>
+                    <Text
+                      cursor="pointer"
+                      color="#000"
+                      fontWeight="bold"
+                      fontSize="18px"
+                      pl="1rem"
+                      onClick={() => navigate("/cadastroAdministrador")}
+                    >
+                      Criar Novo Administrador
+                    </Text>
+                  </>
                 )}
               </Flex>
             ) : (
               <Flex w="100%" h="50%" bg="#FFCCCC">
                 <Drawer.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
                   <Drawer.Trigger asChild>
-                    <Button bg='#FFCCCC' size="sm">
+                    <Button bg="#FFCCCC" size="sm">
                       <RiMenuFill />
                     </Button>
                   </Drawer.Trigger>
@@ -169,7 +181,7 @@ export function MenuUsuario() {
                     <Drawer.Backdrop />
                     <Drawer.Positioner>
                       <Drawer.Content>
-                        <Drawer.Body pt='3rem'>
+                        <Drawer.Body pt="3rem">
                           <Text
                             cursor="pointer"
                             color="#000"
@@ -186,7 +198,7 @@ export function MenuUsuario() {
                             fontWeight="bold"
                             fontSize="18px"
                             pl="1rem"
-                            mt='.5rem'
+                            mt=".5rem"
                             onClick={UploadPage}
                           >
                             Novo Cadastro Vídeo
@@ -199,7 +211,7 @@ export function MenuUsuario() {
                               fontWeight="bold"
                               fontSize="18px"
                               pl="1rem"
-                              mt='.5rem'
+                              mt=".5rem"
                               onClick={() => navigate("/administrador")}
                             >
                               Videos Pendentes
@@ -217,9 +229,21 @@ export function MenuUsuario() {
             ))}
         </>
       ) : (
-        <Text fontSize="sm" color="gray.100">
-          Usuário não encontrado
-        </Text>
+        <Flex w="100%" h="100%" justify="space-between" p={5} align="center">
+          <Flex w='100%' justify="space-between">
+            <Text fontSize="sm" color="gray.100">
+              Usuário não encontrado
+            </Text>
+            <Text
+              cursor="pointer"
+              color="#fff"
+              fontSize={{ sm: "18px", md: "24px", lg: "24px" }}
+              onClick={handleLogout}
+            >
+              Sair da conta
+            </Text>
+          </Flex>
+        </Flex>
       )}
     </Flex>
   );
