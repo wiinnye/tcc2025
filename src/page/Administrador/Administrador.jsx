@@ -115,19 +115,34 @@ export function Administrador() {
   };
 
   return (
-    <Flex pt={{ base: "70px", md: "90px",lg:'100px' }}>
-      <MenuUsuario />
-      <Flex
+    <Flex 
         minH="100vh"
         w="100%"
         direction="column"
         align="center"
-        justify="flex-start"
-        p={6}
-        pt="150px"
-        bg="#F3F5FC"
-      >
-        <Text fontSize="2xl" fontWeight="bold" mb={6}>
+        bg="#fcf9f9"
+        px={4}
+        py={6}
+        pt={{ base: "70px", md: "150px" }}
+        mt={{ base: "300px", md: "20px", lg: "10px" }} 
+    >
+      <MenuUsuario />
+      <Flex w="100%">
+        <Button
+          w="10%"
+          bg="#4cb04c"
+          mb={4}
+          onClick={() => {
+            setCategoriaSelecionada(null);
+            setVideoAberto(null);
+          }}
+        >
+          Voltar
+        </Button>
+      </Flex>
+
+      <Flex w="100%" justify="center" mb={6} direction='column' align='center'>
+        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" mb={6}>
           Moderação de Vídeos Pendentes
         </Text>
 
@@ -165,17 +180,6 @@ export function Administrador() {
               </Flex>
             ) : (
               <>
-                <Button
-                  colorScheme="gray"
-                  mb={4}
-                  onClick={() => {
-                    setCategoriaSelecionada(null);
-                    setVideoAberto(null);
-                  }}
-                >
-                  Voltar
-                </Button>
-
                 <Flex wrap="wrap" justify="center" gap={6} mt={8}>
                   {pendentes
                     .filter((v) => v.categoria === categoriaSelecionada)
@@ -247,61 +251,60 @@ export function Administrador() {
                                 overflowY="auto"
                                 align="center"
                               >
-                              
                                 <Flex
                                   w="100%"
                                   justify="space-between"
                                   mb={4}
-                                  flexDirection='column'
-                                  align='end'
+                                  flexDirection="column"
+                                  align="end"
                                 >
-                                <RiCloseFill
-                                  color="#6AB04C"
-                                  cursor="pointer"
-                                  size="30px"
-                                  mb='1rem'
-                                  onClick={() => setVideoAberto(null)}
-                                />
-                                <video
-                                  style={{
-                                    width: "100%",
-                                    height: "auto",
-                                    maxHeight: "100vh",
-                                    borderRadius: "8px",
-                                    marginTop: '1rem',
-                                  }}
-                                  controls
-                                >
-                                  <source
-                                    src={videoAberto.url}
-                                    type="video/mp4"
+                                  <RiCloseFill
+                                    color="#6AB04C"
+                                    cursor="pointer"
+                                    size="30px"
+                                    mb="1rem"
+                                    onClick={() => setVideoAberto(null)}
                                   />
-                                  Seu navegador não suporta vídeo.
-                                </video>
-                              </Flex>
-                              <Flex
-                                w="100%"
-                                align="center"
-                                justify="space-around"
-                                mt={4}
-                              >
-                                <Button
-                                  w="20%"
-                                  bg="green"
-                                  color="white"
-                                  onClick={() => aprovar(v)}
+                                  <video
+                                    style={{
+                                      width: "100%",
+                                      height: "auto",
+                                      maxHeight: "100vh",
+                                      borderRadius: "8px",
+                                      marginTop: "1rem",
+                                    }}
+                                    controls
+                                  >
+                                    <source
+                                      src={videoAberto.url}
+                                      type="video/mp4"
+                                    />
+                                    Seu navegador não suporta vídeo.
+                                  </video>
+                                </Flex>
+                                <Flex
+                                  w="100%"
+                                  align="center"
+                                  justify="space-around"
+                                  mt={4}
                                 >
-                                  Aprovar
-                                </Button>
-                                <Button
-                                  w="20%"
-                                  bg="red"
-                                  color="white"
-                                  onClick={() => recusar(v)}
-                                >
-                                  <FaRegTrashAlt />
-                                </Button>
-                              </Flex>
+                                  <Button
+                                    w="20%"
+                                    bg="green"
+                                    color="white"
+                                    onClick={() => aprovar(v)}
+                                  >
+                                    Aprovar
+                                  </Button>
+                                  <Button
+                                    w="20%"
+                                    bg="red"
+                                    color="white"
+                                    onClick={() => recusar(v)}
+                                  >
+                                    <FaRegTrashAlt />
+                                  </Button>
+                                </Flex>
                               </Flex>
                             </Flex>
                           )}

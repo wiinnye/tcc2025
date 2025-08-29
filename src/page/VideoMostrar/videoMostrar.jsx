@@ -1,16 +1,18 @@
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Flex, Text, Spinner, Image, Button } from "@chakra-ui/react";
+import { Flex, Text, Image, Button } from "@chakra-ui/react";
 import { db } from "../../services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { MenuUsuario } from "../../components/Menu/menu";
-import { RiCloseFill } from "react-icons/ri";
+import { RiCloseFill, RiArrowLeftLine  } from "react-icons/ri";
+import { SpinnerPage } from "../../components/Spinner/Spinner";
 
 export function VideoMostrar() {
   const { categoria } = useParams();
   const [videos, setVideos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [videoSelecionado, setVideoSelecionado] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const buscarVideos = async () => {
@@ -49,12 +51,24 @@ export function VideoMostrar() {
         w="100%"
         direction="column"
         align="center"
-        bg="#F3F5FC"
+        bg="#fcf9f9"
         px={4}
         py={6}
-        pt={{ base: "70px", md: "150px" }}
+        pt={{ base: "130px", md: "150px" }}
       >
         <MenuUsuario />
+        <Flex w="100%">
+          <Button
+              w={{base:"15%", lg:"10%"}}
+              bg='#4cb04c'
+              mb={4}
+              onClick={() => {
+                navigate("/categorias");
+              }}
+            >
+              <RiArrowLeftLine />
+          </Button>
+        </Flex>
 
         <Flex w="100%" justify="center" mb={6}>
           <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold">
@@ -63,17 +77,11 @@ export function VideoMostrar() {
         </Flex>
 
         {carregando ? (
-          <Spinner size="lg" color="#6AB04C" />
+          <SpinnerPage />
         ) : videos.length === 0 ? (
           <Text>Nenhum vídeo encontrado.</Text>
         ) : (
-          <Flex
-            wrap="wrap"
-            justify="center"
-            gap={6}
-            w="100%"
-            maxW="1200px"
-          >
+          <Flex wrap="wrap" justify="center" gap={6} w="100%" maxW="1200px">
             {videos.map((video, index) => (
               <Flex
                 key={index}
@@ -87,19 +95,17 @@ export function VideoMostrar() {
                 maxW="250px"
               >
                 <Image
-                  src={video.thumbnail || "https://via.placeholder.com/400x200.png?text=Prévia"}
+                  src={
+                    video.thumbnail ||
+                    "https://via.placeholder.com/400x200.png?text=Prévia"
+                  }
                   alt="Thumb do vídeo"
                   objectFit="cover"
                   w="100%"
                   h="150px"
                 />
                 <Flex direction="column" p={4}>
-                  <Text
-                    fontWeight="bold"
-                    fontSize="md"
-                    mb={2}
-                    noOfLines={1}
-                  >
+                  <Text fontWeight="bold" fontSize="md" mb={2} noOfLines={1}>
                     {video.titulo.toUpperCase()}
                   </Text>
                   <Button
