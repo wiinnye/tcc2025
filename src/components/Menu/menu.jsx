@@ -188,6 +188,7 @@ export function MenuUsuario() {
                             fontWeight="bold"
                             fontSize="18px"
                             pl="1rem"
+                            mt="1rem"
                             onClick={() => navigate("/tradutor")}
                           >
                             Início
@@ -198,24 +199,39 @@ export function MenuUsuario() {
                             fontWeight="bold"
                             fontSize="18px"
                             pl="1rem"
-                            mt=".5rem"
+                            mt="1rem"
                             onClick={UploadPage}
                           >
                             Novo Cadastro Vídeo
                           </Text>
 
                           {usuario.tipo === "adm" && (
-                            <Text
-                              cursor="pointer"
-                              color="#000"
-                              fontWeight="bold"
-                              fontSize="18px"
-                              pl="1rem"
-                              mt=".5rem"
-                              onClick={() => navigate("/administrador")}
-                            >
-                              Videos Pendentes
-                            </Text>
+                            <>
+                              <Text
+                                cursor="pointer"
+                                color="#000"
+                                fontWeight="bold"
+                                fontSize="18px"
+                                pl="1rem"
+                                mt="1rem"
+                                onClick={() => navigate("/administrador")}
+                              >
+                                Videos Pendentes
+                              </Text>
+                              <Text
+                                cursor="pointer"
+                                color="#000"
+                                fontWeight="bold"
+                                fontSize="18px"
+                                pl="1rem"
+                                mt="1rem"
+                                onClick={() =>
+                                  navigate("/cadastroAdministrador")
+                                }
+                              >
+                                Criar Novo Administrador
+                              </Text>
+                            </>
                           )}
                         </Drawer.Body>
                         <Drawer.CloseTrigger asChild>
@@ -230,7 +246,7 @@ export function MenuUsuario() {
         </>
       ) : (
         <Flex w="100%" h="100%" justify="space-between" p={5} align="center">
-          <Flex w='100%' justify="space-between">
+          <Flex w="100%" justify="space-between">
             <Text fontSize="sm" color="gray.100">
               Usuário não encontrado
             </Text>
