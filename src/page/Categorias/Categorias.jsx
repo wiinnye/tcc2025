@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Flex, Text, Spinner } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { MenuUsuario } from "../../components/Menu/menu";
 import bgCategoria from "../../image/bgCategoria.png"
 import { SpinnerPage } from "../../components/Spinner/Spinner";
+import { Footer } from "../../components/Footer/Footer"
 
 export function Categorias() {
   const [categorias, setCategorias] = useState([]);
@@ -53,8 +54,8 @@ export function Categorias() {
   return (
     <Flex
       w="100%"
-      minH="100vh"
-      direction={{ base: "column-reverse", lg: "row" }}
+      h="100vh"
+      direction="column"
       justify="center"
       align="center"
       bg='#fcf9f9'
@@ -62,14 +63,15 @@ export function Categorias() {
       <MenuUsuario />
       <Flex
         w='100%'
-        direction={{ base: "column-reverse", lg: "row" }}
+        h="100%"
         justify="center"
         align="center"
+        mt='2.5rem'
       >
           {carregando ? (
             <SpinnerPage />
           ) : (
-            <Flex w='100%' h='100vh'  justify="center" align='center' gap="1rem" mt="2rem" wrap="wrap">
+            <Flex w='100%' h={{base:'50%',lg:'100%'}} justify="center" align='center' gap="1rem" mt="2rem" wrap="wrap">
               {categorias.map((categoria, index) => (
                 <Flex
                   key={index}
@@ -100,7 +102,8 @@ export function Categorias() {
               ))}
             </Flex>
           )}
-    </Flex>
+      </Flex>
+    <Footer/>
       </Flex>
   );
 }

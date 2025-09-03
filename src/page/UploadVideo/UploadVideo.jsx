@@ -88,8 +88,9 @@ export function UploadVideo() {
   };
 
   return (
-    <Flex minH='100vh'>
+    <Flex minH='100vh' direction="column">
       <MenuUsuario />
+      <Flex justify='center'> 
       {isMobile && (
         <Box
           position="absolute"
@@ -100,13 +101,13 @@ export function UploadVideo() {
           backgroundImage={`url(${bgFuntlibra})`}
           backgroundSize="cover"
           backgroundPosition="center"
-          zIndex={0}
+          zIndex={-1}
         />
       )}
       <Flex
         w={{ base: "100%", lg: "50%" }}
-        h="100vh"
-        alignItems={"center"}
+        h="100%"
+        alignItems="center"
         justify='center'
         flexDirection="column"
         position="relative"
@@ -194,10 +195,11 @@ export function UploadVideo() {
         </Flex>
       </Flex>
       {!isMobile && (
-        <Flex w="50%">
+        <Flex w="50%" zIndex={-1}>
           <Image w="1000px" h="100vh" src={bgFuntlibra}></Image>
         </Flex>
       )}
+      </Flex>
     </Flex>
   );
 }

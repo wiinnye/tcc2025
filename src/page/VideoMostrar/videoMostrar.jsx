@@ -1,11 +1,12 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Flex, Text, Image, Button } from "@chakra-ui/react";
+import { Flex, Text, Image, Button, Grid, GridItem } from "@chakra-ui/react";
 import { db } from "../../services/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { MenuUsuario } from "../../components/Menu/menu";
-import { RiCloseFill, RiArrowLeftLine  } from "react-icons/ri";
+import { RiCloseFill, RiArrowLeftLine } from "react-icons/ri";
 import { SpinnerPage } from "../../components/Spinner/Spinner";
+import { Footer } from "../../components/Footer/Footer"
 
 export function VideoMostrar() {
   const { categoria } = useParams();
@@ -24,7 +25,7 @@ export function VideoMostrar() {
         if (docSnap.exists()) {
           const data = docSnap.data();
 
-          // 🚩 AGORA PEGA DA `lista`
+          // AGORA PEGA DA `lista`
           const listaVideos = data.lista || [];
 
           const filtrados = listaVideos.filter(
@@ -45,43 +46,38 @@ export function VideoMostrar() {
   }, [categoria]);
 
   return (
-    <>
-      <Flex
-        minH="100vh"
-        w="100%"
-        direction="column"
-        align="center"
-        bg="#fcf9f9"
-        px={4}
-        py={6}
-        pt={{ base: "130px", md: "150px" }}
-      >
+    <Grid w="100%" h="100vh" templateColumns="repeat(1, 2fr)" >
+      <GridItem w="100%" h="100%">
         <MenuUsuario />
-        <Flex w="100%">
+      </GridItem> 
+      <GridItem w="100%" h="100%" mt='3rem' p='5'>
           <Button
-              w={{base:"15%", lg:"10%"}}
-              bg='#4cb04c'
-              mb={4}
-              onClick={() => {
-                navigate("/categorias");
-              }}
-            >
-              <RiArrowLeftLine />
+            w={{ base: "15%", lg: "10%" }}
+            bg="#4cb04c"
+            mb={4}
+            onClick={() => {
+              navigate("/categorias");
+            }}
+          >
+            <RiArrowLeftLine />
           </Button>
-        </Flex>
+      </GridItem>
 
-        <Flex w="100%" justify="center" mb={6}>
-          <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold">
+      <GridItem w="100%" h="100%">
+        {/* <Flex w="100%" justify="center" mb={6}> */}
+          <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" textAlign='center'>
             Vídeos da categoria: {categoria.toUpperCase()}
           </Text>
-        </Flex>
+        {/* </Flex> */}
+      </GridItem>
 
+      <GridItem w="100%" h="100%">
         {carregando ? (
           <SpinnerPage />
         ) : videos.length === 0 ? (
           <Text>Nenhum vídeo encontrado.</Text>
         ) : (
-          <Flex wrap="wrap" justify="center" gap={6} w="100%" maxW="1200px">
+          <Flex wrap="wrap" justify="center" align='center' gap={6} w="100%">
             {videos.map((video, index) => (
               <Flex
                 key={index}
@@ -95,10 +91,7 @@ export function VideoMostrar() {
                 maxW="250px"
               >
                 <Image
-                  src={
-                    video.thumbnail ||
-                    "https://via.placeholder.com/400x200.png?text=Prévia"
-                  }
+                  src={video.thumbnail}
                   alt="Thumb do vídeo"
                   objectFit="cover"
                   w="100%"
@@ -162,7 +155,7 @@ export function VideoMostrar() {
                 style={{
                   width: "100%",
                   height: "auto",
-                  maxHeight: "70vh",
+                  maxHeight: "100vh",
                   borderRadius: "8px",
                 }}
                 controls
@@ -173,7 +166,11 @@ export function VideoMostrar() {
             </Flex>
           </Flex>
         )}
-      </Flex>
-    </>
+      </GridItem>
+
+      {/* <GridItem w="100%"> */}
+        <Footer/>
+      {/* </GridItem> */}
+    </Grid>
   );
 }

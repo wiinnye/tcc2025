@@ -1,5 +1,14 @@
 import { useState, useEffect } from "react";
-import { Flex, Text, Spinner, Image, Button, Box } from "@chakra-ui/react";
+import {
+  Flex,
+  Text,
+  Spinner,
+  Image,
+  Button,
+  Box,
+  GridItem,
+  Grid,
+} from "@chakra-ui/react";
 import { db } from "../../services/firebase";
 import {
   collection,
@@ -12,7 +21,7 @@ import {
 import { MenuUsuario } from "../../components/Menu/menu";
 import { Notificacao } from "../../components/Notificacao/Notificacao";
 import { FaRegTrashAlt } from "react-icons/fa";
-import { RiCloseFill } from "react-icons/ri";
+import { RiCloseFill, RiArrowLeftLine } from "react-icons/ri";
 
 export function Administrador() {
   const [pendentes, setPendentes] = useState([]);
@@ -115,21 +124,19 @@ export function Administrador() {
   };
 
   return (
-    <Flex 
-        minH="100vh"
+    <Grid w="100%" h="100%" templateColumns="repeat(1, 5fr)" gap={3}>
+      <GridItem w="100%" h="100">
+        <MenuUsuario />
+      </GridItem>
+
+      <GridItem
         w="100%"
-        direction="column"
-        align="center"
-        bg="#fcf9f9"
-        px={4}
-        py={6}
-        pt={{ base: "70px", md: "150px" }}
-        mt={{ base: "300px", md: "20px", lg: "10px" }} 
-    >
-      <MenuUsuario />
-      <Flex w="100%">
+        h="100"
+        p={{ base: ".6rem", md: "1rem" }}
+        mt={{ base: "3rem", md: "2rem" }}
+      >
         <Button
-          w="10%"
+          w={{ base: "20%", md: "10%" }}
           bg="#4cb04c"
           mb={4}
           onClick={() => {
@@ -137,12 +144,17 @@ export function Administrador() {
             setVideoAberto(null);
           }}
         >
-          Voltar
+          <RiArrowLeftLine />
         </Button>
-      </Flex>
+      </GridItem>
 
-      <Flex w="100%" justify="center" mb={6} direction='column' align='center'>
-        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" mb={6}>
+      <GridItem w="100%" h="100" p="1rem">
+        <Text
+          fontSize={{ base: "xl", md: "2xl" }}
+          fontWeight="bold"
+          mb={6}
+          textAlign="center"
+        >
           Moderação de Vídeos Pendentes
         </Text>
 
@@ -151,14 +163,21 @@ export function Administrador() {
         ) : (
           <>
             {!categoriaSelecionada ? (
-              <Flex wrap="wrap" justify="center" gap={6}>
+              <Flex
+                w="100%"
+                minH="100%"
+                justify="center"
+                align="center"
+                gap={3}
+              >
                 {categorias.map((cat) => (
                   <Box
                     key={cat.nome}
+                    maxH="50%"
                     bg="#fff"
                     border="2px solid #6AB04C"
                     borderRadius="md"
-                    p={4}
+                    p="1rem"
                     cursor="pointer"
                     boxShadow="md"
                     onClick={() => setCategoriaSelecionada(cat.nome)}
@@ -196,10 +215,7 @@ export function Administrador() {
                         p={4}
                       >
                         <Image
-                          src={
-                            v.thumbnail ||
-                            "https://via.placeholder.com/400x200.png?text=Prévia+do+Vídeo"
-                          }
+                          src={v.thumbnail}
                           alt="Thumb do vídeo"
                           objectFit="cover"
                           w="100%"
@@ -211,10 +227,10 @@ export function Administrador() {
                             {v.titulo.toUpperCase()}
                           </Text>
                           <Text fontSize="sm" color="gray.500">
-                            Intérprete: {v.interprete || "Não informado"}
+                            Intérprete: {v.interpete || "Não informado"}
                           </Text>
                           <Text fontSize="sm" color="gray.500">
-                            Email: {v.email || "Não informado"}
+                            Email: {v.interpreteEmail || "Não informado"}
                           </Text>
 
                           <Button
@@ -316,10 +332,11 @@ export function Administrador() {
             )}
           </>
         )}
-      </Flex>
+      </GridItem>
+
       {mensagem && (
         <Notificacao mensagem={mensagem} onClose={() => setMensagem("")} />
       )}
-    </Flex>
+    </Grid>
   );
 }

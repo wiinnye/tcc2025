@@ -14,6 +14,7 @@ import { auth, db } from "../../services/firebase";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { RiArrowLeftLine  } from "react-icons/ri";
 
 export function CadastroAdm() {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -85,7 +86,7 @@ export function CadastroAdm() {
     });
 
     setMensagem("✅ Conta criada com sucesso!");
-    navigate("/")
+    navigate("/login")
     console.log("Usuário salvo:", user.uid);
   } catch (erro) {
     console.error("❌ Erro ao criar usuário:", erro);
@@ -120,7 +121,13 @@ export function CadastroAdm() {
     >
       <Flex w={{base:"100%", lg:"50%"}} h="100%" alignItems={"center"} flexDirection="column" position="relative" zIndex={1}>
         <Flex w='100%' h='20%' justify="start" align='center' pl='2rem'>
-          <Button w="100px" color='#F3F5FC' bg='#579b3e' onClick={() => navigate("/")} fontSize='20px'> Voltar</Button>
+          <Button 
+          w="100px" 
+          bg='#579b3e' 
+          onClick={() => navigate("/login")} 
+        > 
+            <RiArrowLeftLine />
+          </Button>
         </Flex>
         <Flex
           w={{ base: "300px", md: "350px", lg: "500px" }}
