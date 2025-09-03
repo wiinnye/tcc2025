@@ -59,15 +59,11 @@ export function MenuUsuario() {
 
   return (
     <Flex
-      position="fixed"
-      top={0}
-      left={0}
-      right={0}
+      w='100%'
+      h={{ base: "70px", md: "90px", lg:'100px' }}
       bg="#4cb04c"
       direction="column"
       boxShadow="sm"
-      zIndex="900"
-      h={{ base: "70px", md: "90px" }}
     >
       {carregando ? (
         <SpinnerPage />

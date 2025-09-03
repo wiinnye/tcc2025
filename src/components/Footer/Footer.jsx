@@ -10,7 +10,6 @@ export function Footer() {
         px={{ base: 4, md: 12 }}
         py={6}
       >
-
         <Flex gap={4}>
           <Link href="/quesomos" _hover={{ textDecoration: "underline" }}>
             Quem Somos

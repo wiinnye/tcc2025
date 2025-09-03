@@ -10,7 +10,7 @@ export function CardCategoria() {
   };
 
   return (
-    <Flex w="100%" h="100%" bg="#6AB04C" align='center'>
+    <Flex w="100%" bg="#6AB04C" align='center'>
       <Box
         w="100%"
         h="300px"
