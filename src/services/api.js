@@ -84,6 +84,7 @@ export async function buscarPorCategoria(categoria) {
 
 // 👉 SALVAR vídeo (com nome e url)
 export async function salvarVideoNoFirestore(categoria, videoUrl, nomeVideo, thumbnailUrl, interpreteId, interpreteEmail) {
+  
   await addDoc(collection(db, "videos_pendentes"), {
     titulo: nomeVideo,
     url: videoUrl,
