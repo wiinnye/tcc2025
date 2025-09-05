@@ -1,13 +1,22 @@
 // Notificacao.jsx
-import { Box, Text, Flex } from "@chakra-ui/react";
+import { Text,Grid, GridItem } from "@chakra-ui/react";
+import { useEffect } from "react";
 
 export function Notificacao({ mensagem, onClose }) {
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (onClose) onClose();
+    }, 5000); 
+
+    return () => clearTimeout(timer);
+  }, [onClose]);
+
   return (
-    <Flex
-      w='250px'
+    <Grid
+      h="10%"
       position="fixed"
-      bottom="20px"
-      right="20px"
+      bottom="30px"
+      right="30px"
       bg="green.500"
       color="white"
       px={4}
@@ -15,17 +24,12 @@ export function Notificacao({ mensagem, onClose }) {
       borderRadius="md"
       boxShadow="md"
       zIndex={9999}
-      justify='space-between'
+      justifyItems="center"
+      alignItems='center'
     >
-      <Text fontSize='20px'>{mensagem}</Text>
-      <Box
-        ml={4}
-        as="button"
-        onClick={onClose}
-        fontWeight="bold"
-      >
-        X
-      </Box>
-    </Flex>
+      <GridItem >
+      <Text fontSize="20px" >{mensagem}</Text>
+      </GridItem>
+    </Grid>
   );
 }
