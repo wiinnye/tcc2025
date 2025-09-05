@@ -122,8 +122,11 @@ export function Administrador() {
       console.error("Erro:", error);
     }
   };
+const videoSelecionado = pendentes.find((vid) => vid.id === videoAberto);
 
-  return (
+console.log(videoSelecionado)
+  
+return (
     <Grid w="100%" h="100%" templateColumns="repeat(1, 5fr)" gap={3}>
       <GridItem w="100%" h="100">
         <MenuUsuario />
@@ -243,7 +246,7 @@ export function Administrador() {
                             Abrir Vídeo
                           </Button>
 
-                          {videoAberto === v.id && (
+                          {videoSelecionado && (
                             <Flex
                               position="fixed"
                               top="0"
@@ -292,7 +295,7 @@ export function Administrador() {
                                     controls
                                   >
                                     <source
-                                      src={videoAberto.url}
+                                      src={videoSelecionado.url}
                                       type="video/mp4"
                                     />
                                     Seu navegador não suporta vídeo.

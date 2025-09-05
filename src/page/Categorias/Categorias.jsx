@@ -92,7 +92,7 @@ export function Categorias() {
                     mb={{base:'3rem',md:'124px', lg:'110px'}}
                     fontWeight="bold"
                     color="#fff"
-                    fontSize={{base:'md',md:'24px',lg:"26px"}}
+                    // fontSize={{base:'md',md:'24px',lg:"26px"}}
                     textAlign='center'
                   >
                     {categoria.toUpperCase()}

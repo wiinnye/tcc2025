@@ -15,12 +15,12 @@ export async function uploadVideoToCloudinary(file) {
     const data = await res.json();
     const videoUrl = data.secure_url;
     const thumbnailUrl = videoUrl
-    .replace("/upload/", "/upload/so_5/") // so_5 = start offset 5s
+    .replace("/upload/", "/upload/so_5/")
     .replace(".mp4", ".jpg");
 
     return { videoUrl, thumbnailUrl };
   } catch (error) {
-    console.error("❌ Erro ao enviar para Cloudinary:", error);
+    console.error("Erro ao enviar para Cloudinary:", error);
     throw error;
   }
 }
