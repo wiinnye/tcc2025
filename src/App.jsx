@@ -86,7 +86,7 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "./services/firebase"; 
 import { doc, getDoc } from "firebase/firestore";
 import { Categorias } from "./page/Categorias/Categorias";
-import { QueSomos } from "./page/QueSomos/QueSomos";
+import { QuemSomos } from "./page/QuemSomos/QuemSomos";
 import { CadastroAdm } from "./page/CadastroAdm/cadastroAdm";
 import { RotaPrivada } from "./page/Rotas/RotaPrivada"
 
@@ -161,7 +161,7 @@ export default function App() {
             <Route path="/recuperarSenha" element={<RecuperarSenha />} />
             <Route path="/administrador" element={<Administrador />} />
             <Route path="/categorias" element={<Categorias />} />
-            <Route path="/queSomos" element={<QueSomos />} />
+            <Route path="/quemSomos" element={<QuemSomos />} />
 
             <Route path="*" element={<Home />} /> {/* fallback */}
           </>

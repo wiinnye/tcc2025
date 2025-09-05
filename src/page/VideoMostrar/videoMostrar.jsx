@@ -1,19 +1,42 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Flex, Text, Image, Button, Grid, GridItem } from "@chakra-ui/react";
+import { Flex, Text, Image, Button, Grid, GridItem, Box } from "@chakra-ui/react";
 import { db } from "../../services/firebase";
-import { doc, getDoc } from "firebase/firestore";
+import { doc, getDoc,updateDoc } from "firebase/firestore";
 import { MenuUsuario } from "../../components/Menu/menu";
 import { RiCloseFill, RiArrowLeftLine } from "react-icons/ri";
 import { SpinnerPage } from "../../components/Spinner/Spinner";
 import { Footer } from "../../components/Footer/Footer"
+import { getAuth } from "firebase/auth";
+import { RiDeleteBin6Line } from "react-icons/ri";
+import { Notificacao } from "../../components/Notificacao/Notificacao";
 
 export function VideoMostrar() {
   const { categoria } = useParams();
   const [videos, setVideos] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [videoSelecionado, setVideoSelecionado] = useState(null);
+  const [notificacao, setNotificacao] = useState(false);
+  
   const navigate = useNavigate();
+
+  const [usuario, setUsuario] = useState(null);
+
+useEffect(() => {
+  const buscarUsuario = async () => {
+    const auth = getAuth();
+    const user = auth.currentUser;
+    if (user) {
+      const docRef = doc(db, "usuarios", user.uid);
+      const docSnap = await getDoc(docRef);
+      if (docSnap.exists()) {
+        setUsuario(docSnap.data());
+      }
+    }
+  };
+
+  buscarUsuario();
+}, []);
 
   useEffect(() => {
     const buscarVideos = async () => {
@@ -44,6 +67,26 @@ export function VideoMostrar() {
 
     buscarVideos();
   }, [categoria]);
+
+  const excluirVideo = async (video) => {
+  try {
+    const docRef = doc(db, "videos", "libra");
+    const docSnap = await getDoc(docRef);
+
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const novaLista = (data.lista || []).filter(v => v.url !== video.url); 
+      
+      await updateDoc(docRef, { lista: novaLista });
+      setVideos(novaLista); // atualiza estado
+
+    setNotificacao(true) // ativa a notidficação
+    navigate('/categorias')
+    }
+  } catch (erro) {
+    notificacao("Erro ao excluir vídeo:", erro);
+  }
+};
 
   return (
     <Grid w="100%" h="100vh" templateColumns="repeat(1, 2fr)" >
@@ -89,6 +132,7 @@ export function VideoMostrar() {
                 overflow="hidden"
                 w="100%"
                 maxW="250px"
+                // align='center'
               >
                 <Image
                   src={video.thumbnail}
@@ -97,20 +141,33 @@ export function VideoMostrar() {
                   w="100%"
                   h="150px"
                 />
-                <Flex direction="column" p={4}>
-                  <Text fontWeight="bold" fontSize="md" mb={2} noOfLines={1}>
+                <Flex  justify='space-between' p={4}>
+                  <Text fontWeight="bold" fontSize="md" textAlign='center' noOfLines={1}>
                     {video.titulo.toUpperCase()}
                   </Text>
-                  <Button
+                  {usuario?.tipo === "adm" && (
+                    <Box>
+                    <RiDeleteBin6Line
+                      size={24}
+                      color="#ff0000"
+                      style={{  cursor: "pointer" }}
+                      onClick={() => excluirVideo(video)}
+                    />
+                    </Box>
+                  )}
+                </Flex>
+                <Button
+                    w='70%'
                     bg="#6AB04C"
                     size="sm"
                     color="white"
+                    m='1rem'
+                    alignSelf='center'
                     _hover={{ bg: "#5CA13E" }}
                     onClick={() => setVideoSelecionado(video)}
                   >
                     Assistir vídeo
                   </Button>
-                </Flex>
               </Flex>
             ))}
           </Flex>
@@ -166,11 +223,15 @@ export function VideoMostrar() {
             </Flex>
           </Flex>
         )}
-      </GridItem>
 
-      {/* <GridItem w="100%"> */}
+        {notificacao && (
+        <Notificacao
+          mensagem="Vídeo Excluído com sucesso!"
+          onClose={() => setNotificacao(false)}
+        />
+      )}
+      </GridItem>
         <Footer/>
-      {/* </GridItem> */}
     </Grid>
   );
 }

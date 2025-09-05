@@ -11,7 +11,7 @@ export function Footer() {
         py={6}
       >
         <Flex gap={4}>
-          <Link href="/quesomos" _hover={{ textDecoration: "underline" }}>
+          <Link href="/quemsomos" _hover={{ textDecoration: "underline" }}>
             Quem Somos
           </Link>
           <Link href="#" _hover={{ textDecoration: "underline" }}>

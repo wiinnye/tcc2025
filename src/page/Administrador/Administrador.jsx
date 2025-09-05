@@ -115,7 +115,7 @@ export function Administrador() {
         }))
       );
 
-      setMensagem("🚫 Vídeo recusado!");
+      setMensagem(" Vídeo recusado!");
       setTimeout(() => setMensagem(""), 5000);
       setVideoAberto(null);
     } catch (error) {
