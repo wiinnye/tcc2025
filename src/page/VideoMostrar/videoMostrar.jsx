@@ -1,6 +1,6 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { Flex, Text, Image, Button, Grid, GridItem, Box } from "@chakra-ui/react";
+import { Flex, Text, Image, Button, Grid, GridItem, Box, Input } from "@chakra-ui/react";
 import { db } from "../../services/firebase";
 import { doc, getDoc,updateDoc } from "firebase/firestore";
 import { MenuUsuario } from "../../components/Menu/menu";
@@ -17,10 +17,13 @@ export function VideoMostrar() {
   const [carregando, setCarregando] = useState(true);
   const [videoSelecionado, setVideoSelecionado] = useState(null);
   const [notificacao, setNotificacao] = useState(false);
-  
-  const navigate = useNavigate();
-
+  const [busca, setBusca] = useState("");
   const [usuario, setUsuario] = useState(null);
+  const navigate = useNavigate();
+  const videosFiltrados = videos.filter((video) =>
+    video.titulo?.toLowerCase().includes(busca.toLowerCase())
+  );
+
 
 useEffect(() => {
   const buscarUsuario = async () => {
@@ -93,17 +96,28 @@ useEffect(() => {
       <GridItem w="100%" h="100%">
         <MenuUsuario />
       </GridItem> 
-      <GridItem w="100%" h="100%" mt='3rem' p='5'>
-          <Button
+      <GridItem w="100%" h="100%" mt='4rem' p='5'>
+        <Flex w="100%" justify='space-between' align='center'>
+            <Button
             w={{ base: "15%", lg: "10%" }}
             bg="#4cb04c"
-            mb={4}
             onClick={() => {
               navigate("/categorias");
             }}
           >
             <RiArrowLeftLine />
           </Button>
+          <Input
+          placeholder="Buscar vídeo pelo nome..."
+          value={busca}
+          onChange={(e) => setBusca(e.target.value)}
+          w={{ base: "90%", md: "20%" }}
+          // mx="auto"
+          display="block"
+        />
+
+        </Flex>
+    
       </GridItem>
 
       <GridItem w="100%" h="100%">
@@ -117,11 +131,11 @@ useEffect(() => {
       <GridItem w="100%" h="100%">
         {carregando ? (
           <SpinnerPage />
-        ) : videos.length === 0 ? (
-          <Text>Nenhum vídeo encontrado.</Text>
+        ) : videosFiltrados.length === 0 ? (
+          <Text textAlign="center" mt="4">Nenhum vídeo encontrado.</Text>
         ) : (
           <Flex wrap="wrap" justify="center" align='center' gap={6} w="100%" p='3rem'>
-            {videos.map((video, index) => (
+            {videosFiltrados.map((video, index) => (
               <Flex
                 key={index}
                 direction="column"
