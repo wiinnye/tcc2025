@@ -120,7 +120,7 @@ useEffect(() => {
         ) : videos.length === 0 ? (
           <Text>Nenhum vídeo encontrado.</Text>
         ) : (
-          <Flex wrap="wrap" justify="center" align='center' gap={6} w="100%">
+          <Flex wrap="wrap" justify="center" align='center' gap={6} w="100%" p='3rem'>
             {videos.map((video, index) => (
               <Flex
                 key={index}
@@ -132,6 +132,7 @@ useEffect(() => {
                 overflow="hidden"
                 w="100%"
                 maxW="250px"
+                p='2rem'
                 // align='center'
               >
                 <Image

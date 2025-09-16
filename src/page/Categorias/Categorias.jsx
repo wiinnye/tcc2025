@@ -1,12 +1,13 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Flex, Text } from "@chakra-ui/react";
+import { Button, Flex, Grid, GridItem, Text } from "@chakra-ui/react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { MenuUsuario } from "../../components/Menu/menu";
-import bgCategoria from "../../image/bgCategoria.png"
+import bgCategoria from "../../image/bgCategoria.png";
 import { SpinnerPage } from "../../components/Spinner/Spinner";
-import { Footer } from "../../components/Footer/Footer"
+import { Footer } from "../../components/Footer/Footer";
+import { RiArrowLeftLine } from "react-icons/ri";
 
 export function Categorias() {
   const [categorias, setCategorias] = useState([]);
@@ -52,35 +53,59 @@ export function Categorias() {
   }, []);
 
   return (
-    <Flex
-      w="100%"
-      h="100vh"
-      direction="column"
-      justify="center"
-      align="center"
-      bg='#fcf9f9'
-    >
-      <MenuUsuario />
-      <Flex
-        w='100%'
-        h="100%"
-        justify="center"
-        align="center"
-        mt='2.5rem'
-      >
-          {carregando ? (
-            <SpinnerPage />
-          ) : (
-            <Flex w='100%' h={{base:'50%',lg:'100%'}} justify="center" align='center' gap="1rem" mt="2rem" wrap="wrap">
+    <Grid w="100%" minH="100vh" templateColumns="repeat(1, 2fr)">
+      <GridItem w="100%" h="100%">
+        <MenuUsuario />
+      </GridItem>
+      <GridItem w="100%" h="50%" mt="5rem" p="5">
+        <Button
+          w={{ base: "15%", lg: "10%" }}
+          bg="#4cb04c"
+          mb={4}
+          onClick={() => {
+            navigate("/tradutor");
+          }}
+        >
+          <RiArrowLeftLine />
+        </Button>
+      </GridItem>
+
+      <GridItem w="100%">
+        {/* <Flex w="100%" justify="center" mb={6}> */}
+        <Text
+          fontSize={{ base: "xl", md: "2xl" }}
+          fontWeight="bold"
+          textAlign="center"
+        >
+          Confira as Trilhas Disponíveis:
+        </Text>
+        {/* </Flex> */}
+      </GridItem>
+
+      <GridItem w="100%" h="100%">
+        {carregando ? (
+          <SpinnerPage />
+        ) : (
+          <>
+            <Flex
+              wrap="wrap"
+              justify="center"
+              align="center"
+              gap={3}
+              w="100%"
+              h="100%"
+              p='3rem'
+            >
               {categorias.map((categoria, index) => (
                 <Flex
                   key={index}
                   cursor="pointer"
-                  w={{ base: "120px", md: "300px" }}
-                  h={{ base: "120px", md: "50%" }}
+                  w={{ base: "120px", md: "200px", lg:'300px' }}
+                  h={{ base: "120px", md: "50%", lg:'100%' }}
                   direction="column"
                   align="center"
                   justify="center"
+                  p='3rem'
                   _hover={{ transform: "scale(1.05)", transition: "0.3s" }}
                   backgroundImage={`url(${bgCategoria})`}
                   backgroundSize="contain"
@@ -89,21 +114,22 @@ export function Categorias() {
                   onClick={() => navigate(`/traducao/categoria/${categoria}`)}
                 >
                   <Text
-                    mb={{base:'3rem',md:'124px', lg:'110px'}}
+                    mb={{ base: "3rem", md: "124px", lg: "110px" }}
                     fontWeight="bold"
                     color="#fff"
-                    // fontSize={{base:'md',md:'24px',lg:"26px"}}
-                    textAlign='center'
+                    fontSize={{base:'md',md:'24px',lg:"26px"}}
+                    textAlign="start"
                   >
                     {categoria.toUpperCase()}
                   </Text>
                 </Flex>
-              
               ))}
             </Flex>
-          )}
-      </Flex>
-    <Footer/>
-      </Flex>
+          </>
+        )}
+        <Footer />
+      </GridItem>
+
+    </Grid>
   );
 }
