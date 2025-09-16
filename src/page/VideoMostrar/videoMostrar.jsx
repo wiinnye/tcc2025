@@ -115,7 +115,6 @@ useEffect(() => {
           // mx="auto"
           display="block"
         />
-
         </Flex>
     
       </GridItem>
@@ -127,8 +126,7 @@ useEffect(() => {
           </Text>
         {/* </Flex> */}
       </GridItem>
-
-      <GridItem w="100%" h="100%">
+       <GridItem w="100%" h="100%">
         {carregando ? (
           <SpinnerPage />
         ) : videosFiltrados.length === 0 ? (
@@ -249,4 +247,5 @@ useEffect(() => {
         <Footer/>
     </Grid>
   );
+
 }
