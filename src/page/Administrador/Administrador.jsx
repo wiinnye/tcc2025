@@ -22,6 +22,7 @@ import { MenuUsuario } from "../../components/Menu/menu";
 import { Notificacao } from "../../components/Notificacao/Notificacao";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { RiCloseFill, RiArrowLeftLine } from "react-icons/ri";
+import { useNavigate } from "react-router-dom";
 
 export function Administrador() {
   const [pendentes, setPendentes] = useState([]);
@@ -30,6 +31,7 @@ export function Administrador() {
   const [carregando, setCarregando] = useState(true);
   const [mensagem, setMensagem] = useState("");
   const [videoAberto, setVideoAberto] = useState(null); // Controle de qual vídeo está aberto
+  const navigate = useNavigate()
 
   useEffect(() => {
     const buscarPendentes = async () => {
@@ -123,8 +125,6 @@ export function Administrador() {
     }
   };
 const videoSelecionado = pendentes.find((vid) => vid.id === videoAberto);
-
-console.log(videoSelecionado)
   
 return (
     <Grid w="100%" h="100%" templateColumns="repeat(1, 5fr)" gap={3}>
@@ -132,7 +132,24 @@ return (
         <MenuUsuario />
       </GridItem>
 
-      <GridItem
+      {!categoriaSelecionada ? (<GridItem
+        w="100%"
+        h="100"
+        p={{ base: ".6rem", md: "1rem" }}
+        mt={{ base: "3rem", md: "2rem" }}
+      >
+        <Button
+          w={{ base: "20%", md: "10%" }}
+          bg="#4cb04c"
+          mb={4}
+          onClick={() => {
+            navigate("/tradutor")
+          }}
+        >
+          <RiArrowLeftLine />
+        </Button>
+      </GridItem>):
+   <GridItem
         w="100%"
         h="100"
         p={{ base: ".6rem", md: "1rem" }}
@@ -150,6 +167,7 @@ return (
           <RiArrowLeftLine />
         </Button>
       </GridItem>
+      }
 
       <GridItem w="100%" h="100" p="1rem">
         <Text
@@ -214,7 +232,7 @@ return (
                         borderRadius="md"
                         boxShadow="md"
                         overflow="hidden"
-                        maxW="250px"
+                        minW="20%"
                         p={4}
                       >
                         <Image
@@ -225,18 +243,17 @@ return (
                           h="150px"
                         />
 
-                        <Flex w="100%" mt="1rem" px=".4rem" direction="column">
-                          <Text fontWeight="bold" fontSize="lg">
+                        <Flex minW="50%" mt="1rem" p=".4rem" direction="column" >
+                          <Text fontWeight="bold" fontSize="lg" >
                             {v.titulo.toUpperCase()}
                           </Text>
-                          <Text fontSize="sm" color="gray.500">
+                          {/* <Text fontSize="sm" color="gray.500">
                             Intérprete: {v.interpete || "Não informado"}
-                          </Text>
+                          </Text> */}
                           <Text fontSize="sm" color="gray.500">
-                            Email: {v.interpreteEmail || "Não informado"}
+                            Enviado por: {v.interpreteEmail || "Não informado"}
                           </Text>
-
-                          <Button
+                                    <Button
                             mt={2}
                             size="sm"
                             bg="#6AB04C"
@@ -245,7 +262,6 @@ return (
                           >
                             Abrir Vídeo
                           </Button>
-
                           {videoSelecionado && (
                             <Flex
                               position="fixed"

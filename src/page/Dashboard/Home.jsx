@@ -1,6 +1,6 @@
 import { Flex, Grid, GridItem, Image } from "@chakra-ui/react";
 import { MenuUsuario } from "../../components/Menu/menu";
-import bannerPrincipal from "../../image/banner.png";
+import bannerPrincipal from "../../image/bannerMenor.png";
 import { Footer } from "../../components/Footer/Footer";
 import { CardCategoria } from "../../components/CardCategoria/CardCategoria";
 
@@ -17,7 +17,10 @@ export function Home() {
       <GridItem w="100%" h="100">
         <MenuUsuario />
       </GridItem>
-      <GridItem w="100%" h="100" mt='1.5rem'>
+      <GridItem w="100%" h='100%' mt="2.8rem">
+        <CardCategoria />
+      </GridItem>
+      <GridItem w="100%" mt="3rem">
         <Flex w="100%" direction="column" align="center">
           {/* BANNER */}
           <Image
@@ -27,10 +30,8 @@ export function Home() {
             fit="contain"
           />
         </Flex>
-        <CardCategoria />
         <Footer />
       </GridItem>
-
     </Grid>
   );
 }

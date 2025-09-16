@@ -16,6 +16,7 @@ import { salvarVideoNoFirestore } from "../../services/api";
 import { MenuUsuario } from "../../components/Menu/menu";
 import { getAuth } from "firebase/auth";
 import bgFuntlibra from "../../image/bgFuntlibra.png";
+import {Footer} from "../../components/Footer/Footer"
 
 export function UploadVideo() {
   const [titulo, setTitulo] = useState(""); // Categoria (ex: html)
@@ -89,11 +90,11 @@ export function UploadVideo() {
   };
 
   return (
-    <Grid w="100%" h="100%" templateColumns="repeat(1, 5fr)" gap={3}>
+    <Grid w="100%" h="100%" templateColumns="repeat(1, 6fr)" >
       <GridItem w="100%" h="100">
         <MenuUsuario />
       </GridItem>
-      <GridItem w="100%" h="100" mt="1rem">
+      <GridItem w="100%" h="100%" mt="3.2rem">
         <Flex justify="center">
           {isMobile && (
             <Box
@@ -101,7 +102,7 @@ export function UploadVideo() {
               top={0}
               left={0}
               w="100vw"
-              h="100vh"
+              h="100%"
               backgroundImage={`url(${bgFuntlibra})`}
               backgroundSize="cover"
               backgroundPosition="center"
@@ -116,7 +117,7 @@ export function UploadVideo() {
             flexDirection="column"
             position="relative"
             zIndex={1}
-            pt={{ base: "70px", md: "90px", lg: "120px" }}
+            pt={{ base: "70px", md: "90px", lg: "80px" }}
           >
             <Flex
               w={{ base: "300px", s: "150px", md: "350px", lg: "500px" }}
@@ -210,6 +211,9 @@ export function UploadVideo() {
             </Flex>
           )}
         </Flex>
+      </GridItem>
+      <GridItem>
+        <Footer/>
       </GridItem>
     </Grid>
   );

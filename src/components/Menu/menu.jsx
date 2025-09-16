@@ -16,6 +16,8 @@ import { getDoc, doc } from "firebase/firestore";
 import { db } from "../../services/firebase";
 import { useNavigate } from "react-router-dom";
 import { SpinnerPage } from "../Spinner/Spinner";
+import { MenuLink } from "../MenuLink/MenuLink";
+import { menusPorTipo } from "../../services/menu";
 
 export function MenuUsuario() {
   const [usuario, setUsuario] = useState(null);
@@ -23,6 +25,7 @@ export function MenuUsuario() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
   const isMobile = useBreakpointValue({ base: true, md: false });
+  const menus = menusPorTipo[usuario?.tipo] || [];
 
   useEffect(() => {
     const buscarUsuario = async () => {
@@ -53,194 +56,104 @@ export function MenuUsuario() {
     navigate("/"); // redireciona para a página inicial ou login
   };
 
-  const UploadPage = () => {
-    navigate("/uploadVideo");
-  };
-
   return (
     <Flex
-      w='100%'
-      h={{ base: "70px", md: "90px", lg:'100px' }}
+      w="100%"
+      h={{ base: "70px", md: "90px", lg: "80px" }}
       bg="#4cb04c"
       direction="column"
       boxShadow="sm"
     >
-      {carregando ? (
-        <SpinnerPage />
-      ) : usuario ? (
-        <>
-          <Flex w="100%" h="100%" justify="space-between" p={5} align="center">
-            <Flex align="center" gap={3}>
-              <Flex
-                align="center"
-                justify="center"
-                bg="gray.300"
-                borderRadius="full"
-                w={{ sm: "32px", md: "50px", lg: "60px" }}
-                h={{ sm: "32px", md: "50px", lg: "60px" }}
-              >
-                <FaUserCircle size="40" color="white" />
-              </Flex>
-              <Box textAlign="left" color="white">
-                <Text
-                  fontSize={{ sm: "18px", md: "24px", lg: "24px" }}
-                  fontWeight="bold"
-                  wrap="wrap"
-                >
-                  {usuario.nome || "Usuário"}
-                </Text>
-                <Text fontSize="md" color="#FFCCCC">
-                  {usuario.tipo === "interprete"
-                    ? "Intérprete"
-                    : usuario.tipo === "adm"
-                    ? "Administrador"
-                    : "Aluno"}
-                </Text>
-              </Box>
+      {carregando && <SpinnerPage />}
+
+      {/* terminou de carregar */}
+      {!carregando && usuario && (
+        <Flex w="100%" h="100%" justify="space-between" p={5} align="center">
+          <Flex align="center" gap={3}>
+            <Flex
+              align="center"
+              justify="center"
+              bg="gray.300"
+              borderRadius="full"
+              w={{ sm: "32px", md: "50px", lg: "60px" }}
+              h={{ sm: "32px", md: "50px", lg: "60px" }}
+            >
+              <FaUserCircle size="40" color="white" />
             </Flex>
-            <Flex justify="end" direction="column">
+            <Box textAlign="left" color="white">
               <Text
-                cursor="pointer"
-                color="#fff"
                 fontSize={{ sm: "18px", md: "24px", lg: "24px" }}
-                onClick={handleLogout}
+                fontWeight="bold"
               >
-                Sair da conta
+                {usuario?.nome || "Usuário"}
               </Text>
-            </Flex>
+              <Text fontSize="md" color="#cecece">
+                {usuario?.tipo || ""}
+              </Text>
+            </Box>
           </Flex>
-          {usuario.tipo !== "aluno" &&
-            (!isMobile ? (
-              <Flex
-                w="100%"
-                h="40%"
-                bg="#FFCCCC"
-                align="center"
-                justify="space-around"
-                p="1rem"
-              >
-                <Text
-                  cursor="pointer"
-                  color="#000"
-                  fontWeight="bold"
-                  fontSize="18px"
-                  pl="1rem"
-                  onClick={() => navigate("/tradutor")}
-                >
-                  Início
-                </Text>
-                <Text
-                  cursor="pointer"
-                  color="#000"
-                  fontWeight="bold"
-                  fontSize="18px"
-                  pl="1rem"
-                  onClick={UploadPage}
-                >
-                  Novo Cadastro Vídeo
-                </Text>
+          <Text
+            cursor="pointer"
+            color="#fff"
+            fontSize={{ sm: "18px", md: "24px", lg: "24px" }}
+            onClick={handleLogout}
+          >
+            Sair da conta
+          </Text>
+        </Flex>
+      )}
 
-                {usuario.tipo === "adm" && (
-                  <>
-                    <Text
-                      cursor="pointer"
-                      color="#000"
-                      fontWeight="bold"
-                      fontSize="18px"
-                      pl="1rem"
-                      onClick={() => navigate("/administrador")}
-                    >
-                      Videos Pendentes
-                    </Text>
-                    <Text
-                      cursor="pointer"
-                      color="#000"
-                      fontWeight="bold"
-                      fontSize="18px"
-                      pl="1rem"
-                      onClick={() => navigate("/cadastroAdministrador")}
-                    >
-                      Criar Novo Administrador
-                    </Text>
-                  </>
-                )}
-              </Flex>
-            ) : (
-              <Flex w="100%" h="50%" bg="#FFCCCC">
-                <Drawer.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
-                  <Drawer.Trigger asChild>
-                    <Button bg="#FFCCCC" size="sm">
-                      <RiMenuFill />
-                    </Button>
-                  </Drawer.Trigger>
-                  <Portal>
-                    <Drawer.Backdrop />
-                    <Drawer.Positioner>
-                      <Drawer.Content>
-                        <Drawer.Body pt="3rem">
-                          <Text
-                            cursor="pointer"
-                            color="#000"
-                            fontWeight="bold"
-                            fontSize="18px"
-                            pl="1rem"
-                            mt="1rem"
-                            onClick={() => navigate("/tradutor")}
-                          >
-                            Início
-                          </Text>
-                          <Text
-                            cursor="pointer"
-                            color="#000"
-                            fontWeight="bold"
-                            fontSize="18px"
-                            pl="1rem"
-                            mt="1rem"
-                            onClick={UploadPage}
-                          >
-                            Novo Cadastro Vídeo
-                          </Text>
+      {menus.length > 0 && !isMobile && (
+        <Flex
+          w="100%"
+          bg="#FFCCCC"
+          align="center"
+          textAlign="center"
+          justify="space-around"
+          p="1rem"
+        >
+          {menus.map((m, i) => (
+            <MenuLink
+              key={i}
+              label={m.label}
+              onClick={() => m.rota && navigate(m.rota)}
+            />
+          ))}
+        </Flex>
+      )}
 
-                          {usuario.tipo === "adm" && (
-                            <>
-                              <Text
-                                cursor="pointer"
-                                color="#000"
-                                fontWeight="bold"
-                                fontSize="18px"
-                                pl="1rem"
-                                mt="1rem"
-                                onClick={() => navigate("/administrador")}
-                              >
-                                Videos Pendentes
-                              </Text>
-                              <Text
-                                cursor="pointer"
-                                color="#000"
-                                fontWeight="bold"
-                                fontSize="18px"
-                                pl="1rem"
-                                mt="1rem"
-                                onClick={() =>
-                                  navigate("/cadastroAdministrador")
-                                }
-                              >
-                                Criar Novo Administrador
-                              </Text>
-                            </>
-                          )}
-                        </Drawer.Body>
-                        <Drawer.CloseTrigger asChild>
-                          <CloseButton size="sm" />
-                        </Drawer.CloseTrigger>
-                      </Drawer.Content>
-                    </Drawer.Positioner>
-                  </Portal>
-                </Drawer.Root>
-              </Flex>
-            ))}
-        </>
-      ) : (
+      {menus.length > 0 && isMobile && (
+        <Flex w="100%" h="50%" bg="#FFCCCC">
+          <Drawer.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
+            <Drawer.Trigger asChild>
+              <Button bg="#FFCCCC" size="sm">
+                <RiMenuFill />
+              </Button>
+            </Drawer.Trigger>
+            <Portal>
+              <Drawer.Backdrop />
+              <Drawer.Positioner>
+                <Drawer.Content>
+                  <Drawer.Body pt="3rem">
+                    {menus.map((m, i) => (
+                      <MenuLink
+                        key={i}
+                        label={m.label}
+                        onClick={() => m.rota && navigate(m.rota)}
+                      />
+                    ))}
+                  </Drawer.Body>
+                  <Drawer.CloseTrigger asChild>
+                    <CloseButton size="sm" />
+                  </Drawer.CloseTrigger>
+                </Drawer.Content>
+              </Drawer.Positioner>
+            </Portal>
+          </Drawer.Root>
+        </Flex>
+      )}
+
+      {!carregando && !usuario && (
         <Flex w="100%" h="100%" justify="space-between" p={5} align="center">
           <Flex w="100%" justify="space-between">
             <Text fontSize="sm" color="gray.100">
