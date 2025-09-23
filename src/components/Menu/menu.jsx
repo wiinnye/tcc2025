@@ -59,7 +59,7 @@ export function MenuUsuario() {
   return (
     <Flex
       w="100%"
-      h={{ base: "70px", md: "90px", lg: "80px" }}
+      h="100%"
       bg="#4cb04c"
       direction="column"
       boxShadow="sm"
@@ -68,7 +68,7 @@ export function MenuUsuario() {
 
       {/* terminou de carregar */}
       {!carregando && usuario && (
-        <Flex w="100%" h="100%" justify="space-between" p={5} align="center">
+        <Flex w="100%" h="100%" justify="space-between" p={3} align="center">
           <Flex align="center" gap={3}>
             <Flex
               align="center"
@@ -123,10 +123,10 @@ export function MenuUsuario() {
       )}
 
       {menus.length > 0 && isMobile && (
-        <Flex w="100%" h="50%" bg="#FFCCCC">
+        <Flex w="100%" h="100%" bg="#FFCCCC" align='center'>
           <Drawer.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
             <Drawer.Trigger asChild>
-              <Button bg="#FFCCCC" size="sm">
+              <Button bg="#FFCCCC" size="lg">
                 <RiMenuFill />
               </Button>
             </Drawer.Trigger>
