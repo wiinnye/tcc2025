@@ -57,8 +57,9 @@ export function Categorias() {
       <GridItem w="100%" h="100%">
         <MenuUsuario />
       </GridItem>
-      <GridItem w="100%" h="50%" mt="5rem" p="5">
-        <Button
+      <GridItem w="100%">
+          <Flex w="100%" direction='column' justify="center" p='2rem'>
+          <Button
           w={{ base: "15%", lg: "10%" }}
           bg="#4cb04c"
           mb={4}
@@ -68,10 +69,6 @@ export function Categorias() {
         >
           <RiArrowLeftLine />
         </Button>
-      </GridItem>
-
-      <GridItem w="100%">
-        {/* <Flex w="100%" justify="center" mb={6}> */}
         <Text
           fontSize={{ base: "xl", md: "2xl" }}
           fontWeight="bold"
@@ -79,9 +76,8 @@ export function Categorias() {
         >
           Confira as Trilhas Disponíveis:
         </Text>
-        {/* </Flex> */}
+        </Flex>
       </GridItem>
-
       <GridItem w="100%" h="100%">
         {carregando ? (
           <SpinnerPage />
@@ -93,8 +89,7 @@ export function Categorias() {
               align="center"
               gap={3}
               w="100%"
-              h="100%"
-              p='3rem'
+              h="auto"
             >
               {categorias.map((categoria, index) => (
                 <Flex
@@ -127,9 +122,10 @@ export function Categorias() {
             </Flex>
           </>
         )}
+      </GridItem>
+      <GridItem >
         <Footer />
       </GridItem>
-
     </Grid>
   );
 }

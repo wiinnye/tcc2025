@@ -96,8 +96,12 @@ useEffect(() => {
       <GridItem w="100%" h="100%">
         <MenuUsuario />
       </GridItem> 
-      <GridItem w="100%" h="100%" mt='4rem' p='5'>
-        <Flex w="100%" justify='space-between' align='center'>
+      <GridItem w="100%" h="100%" mt={{lg:'4rem'}} p='5'>
+        <Flex 
+        w="100%"
+        justify='space-between'
+        align={{base:"start",lg:'center'}}
+        gap={{base:"3"}}>
             <Button
             w={{ base: "15%", lg: "10%" }}
             bg="#4cb04c"
@@ -111,8 +115,7 @@ useEffect(() => {
           placeholder="Buscar vídeo pelo nome..."
           value={busca}
           onChange={(e) => setBusca(e.target.value)}
-          w={{ base: "90%", md: "20%" }}
-          // mx="auto"
+          w={{ base: "50%", md: "30%" }}
           display="block"
         />
         </Flex>
@@ -126,7 +129,7 @@ useEffect(() => {
           </Text>
         {/* </Flex> */}
       </GridItem>
-       <GridItem w="100%" h="100%">
+      <GridItem w="100%" h="100%">
         {carregando ? (
           <SpinnerPage />
         ) : videosFiltrados.length === 0 ? (

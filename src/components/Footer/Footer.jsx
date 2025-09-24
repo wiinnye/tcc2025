@@ -1,10 +1,18 @@
-import { Box, Flex, Text, Link } from "@chakra-ui/react";
+import { Flex, Text, Link } from "@chakra-ui/react";
 
 export function Footer() {
-    return (
-    <Box bg="#6AB04C" color="white" w="100%" h='auto' mt='.1rem'>
+  return (
+    <Flex
+      bg="#6AB04C"
+      color="white"
+      w="100%"
+      h="100%"
+      mt=".1rem"
+      justify="center"
+      align="center"
+    >
       <Flex
-        direction='column'
+        direction="column"
         justify="center"
         align="center"
         px={{ base: 4, md: 12 }}
@@ -21,10 +29,11 @@ export function Footer() {
             Políticas de Uso
           </Link>
         </Flex>
-        <Text fontSize="md" mt='1rem'>
-          © {new Date().getFullYear()} Projeto de LIBRAS. Todos os direitos reservados.
+        <Text fontSize="md" mt="1rem">
+          © {new Date().getFullYear()} Projeto de LIBRAS. Todos os direitos
+          reservados.
         </Text>
       </Flex>
-    </Box>
+    </Flex>
   );
 }
