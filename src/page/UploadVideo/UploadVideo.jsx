@@ -16,16 +16,56 @@ import { salvarVideoNoFirestore } from "../../services/api";
 import { MenuUsuario } from "../../components/Menu/menu";
 import { getAuth } from "firebase/auth";
 import bgFuntlibra from "../../image/bgFuntlibra.png";
-import {Footer} from "../../components/Footer/Footer"
+import { Footer } from "../../components/Footer/Footer";
+// import { doc, getDoc } from "firebase/firestore";
+// import { db } from "../../services/firebase";
 
 export function UploadVideo() {
   const [titulo, setTitulo] = useState(""); // Categoria (ex: html)
-  const [nomeVideo, setNomeVideo] = useState(""); 
+  const [nomeVideo, setNomeVideo] = useState("");
   const [file, setFile] = useState(null);
   const [carregando, setCarregando] = useState(false);
   const [mensagem, setMensagem] = useState("");
+  // const [categorias, setCategorias] = useState([]);
 
   const isMobile = useBreakpointValue({ base: true, md: false });
+
+  // useEffect(() => {
+  //   const fetchCategorias = async () => {
+  //     try {
+  //       const docRef = doc(db, "videos", "libra");
+  //       const docSnap = await getDoc(docRef);
+
+  //       if (docSnap.exists()) {
+  //         const data = docSnap.data();
+
+  //         const listaVideos = data.lista || [];
+  //         console.log(listaVideos);
+
+  //         // const listaCategorias = listaVideos.map((video) => ({
+  //         //   label: video.categoria.toUpperCase(),
+  //         //   value: video.categoria.toUpperCase(),
+  //         // }));
+
+  //         const listaCategorias = listaVideos.map((video) => {
+  //           const categoriaKey = video.categoria || "sem_categoria";
+  //           return {
+  //             label: categoriaKey.toUpperCase(),
+  //             value: categoriaKey,
+  //           };
+  //         });
+
+  //         setCategorias(listaCategorias);
+  //       } else {
+  //         console.log("❌ Documento não encontrado!");
+  //       }
+  //     } catch (error) {
+  //       console.error("Erro ao buscar categorias:", error);
+  //     }
+  //   };
+
+  //   fetchCategorias();
+  // }, []);
 
   // const handleUpload = async () => {
   //   if (!titulo.trim() || !nomeVideo.trim() || !file) {
@@ -90,7 +130,7 @@ export function UploadVideo() {
   };
 
   return (
-    <Grid w="100%" h="100%" templateColumns="repeat(1, 6fr)" >
+    <Grid w="100%" h="100%" templateColumns="repeat(1, 6fr)">
       <GridItem w="100%" h="100">
         <MenuUsuario />
       </GridItem>
@@ -145,6 +185,41 @@ export function UploadVideo() {
                 </Text>
               </Flex>
 
+              {/* <Select.Root
+                w={{ base: "200px", md: "250px", lg: "600px" }}
+                size={isMobile ? "md" : "lg"}
+                width="320px"
+                mb="1rem"
+                value={titulo}
+                onValueChange={(value) => setTitulo(value)}
+              >
+                <Select.HiddenSelect />
+                <Select.Control>
+                  <Select.Trigger>
+                    <Select.ValueText placeholder="Selecionar a Linguagem" />
+                  </Select.Trigger>
+                  <Select.IndicatorGroup>
+                    <Select.Indicator />
+                  </Select.IndicatorGroup>
+                </Select.Control>
+
+                <Portal>
+                  <Select.Positioner>
+                    <Select.Content>
+                      {categorias.map((categoria) => (
+                        <Select.Item
+                          key={categoria.value}
+                          item={{ value: categoria.value, label: categoria.label }}
+                        >
+                          <Select.ItemText>{categoria.label}</Select.ItemText>
+                          <Select.ItemIndicator />
+                        </Select.Item>
+                      ))}
+                    </Select.Content>
+                  </Select.Positioner>
+                </Portal>
+              </Select.Root> */}
+
               <Input
                 placeholder="Nome da Linguaguem (ex.: html)"
                 w={{ base: "200px", md: "250px", lg: "350px" }}
@@ -152,7 +227,7 @@ export function UploadVideo() {
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
                 size={isMobile ? "md" : "lg"}
-              />
+              /> 
 
               <Input
                 placeholder="Nome de termo"
@@ -213,7 +288,7 @@ export function UploadVideo() {
         </Flex>
       </GridItem>
       <GridItem>
-        <Footer/>
+        <Footer />
       </GridItem>
     </Grid>
   );

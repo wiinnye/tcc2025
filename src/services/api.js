@@ -34,7 +34,7 @@ export async function buscarVideo(titulo) {
     throw erro;
   }
 }
-// 👉 BUSCAR vídeos da categoria (com nome e url)
+// BUSCAR vídeos da categoria (com nome e url)
 export async function buscarVideosDaCategoria(categoria) {
  try {
     const docRef = doc(db, "videos", "libra");
@@ -55,7 +55,7 @@ export async function buscarVideosDaCategoria(categoria) {
     return [];
   }
 }
-// 👉 BUSCAR por categoria (modo geral)
+// BUSCAR por categoria (modo geral)
 export async function buscarPorCategoria(categoria) {
   try {
     const docRef = doc(db, "videos", "libra");
@@ -82,7 +82,7 @@ export async function buscarPorCategoria(categoria) {
   }
 }
 
-// 👉 SALVAR vídeo (com nome e url)
+// SALVAR vídeo (com nome e url)
 export async function salvarVideoNoFirestore(categoria, videoUrl, nomeVideo, thumbnailUrl, interpreteId, interpreteEmail) {
   
   await addDoc(collection(db, "videos_pendentes"), {
@@ -105,6 +105,19 @@ export async function salvarVideoPendente(titulo, url, categoria, interpreteId, 
     interpreteId,
     interpreteEmail,
     status: "pendente",
+    createdAt: new Date()
+  });
+}
+
+export async function salvarFeedbackAluno( nomeAluno, textoAluno, emailAluno, userId) {
+  
+  await addDoc(collection(db, "feedbackAlunos"), {
+    nome: nomeAluno,
+    feedback: textoAluno,
+    email:emailAluno,
+    userId: userId,
+    respondido: "false",
+    visto: "false",
     createdAt: new Date()
   });
 }
