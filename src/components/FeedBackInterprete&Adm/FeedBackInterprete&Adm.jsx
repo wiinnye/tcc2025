@@ -11,7 +11,7 @@ import {
   Heading,
 } from "@chakra-ui/react";
 
-function FeedbackAdmin() {
+export default function FeedbackAdmin() {
   const [feedbacks, setFeedbacks] = useState([]);
 
   useEffect(() => {
@@ -38,7 +38,7 @@ function FeedbackAdmin() {
 
   return (
     <Box p={4} maxW="800px" mx="auto">
-      <Heading mb={4}>Feedbacks dos Alunos</Heading>
+      <Heading mb={4}>Feedbacks</Heading>
       <VStack spacing={4} align="stretch">
         {feedbacks.map((fb) => (
           <Box key={fb.id} p={4} shadow="md" borderWidth="1px" rounded="md">
@@ -51,15 +51,11 @@ function FeedbackAdmin() {
             <Text mt={2}>{fb.mensagem}</Text>
             <HStack mt={3} spacing={2}>
               {!fb.visto && (
-                <Button size="sm" colorScheme="blue" 
-                onClick={() => marcarVisto(fb.id)}
-                >
+                <Button size="sm" colorScheme="blue" onClick={() => marcarVisto(fb.id)}>
                   Marcar como Visto
                 </Button>
               )}
-              <Button size="sm" colorScheme="red" 
-              onClick={() => apagarFeedback(fb.id)}
-              >
+              <Button size="sm" colorScheme="red" onClick={() => apagarFeedback(fb.id)}>
                 Apagar
               </Button>
             </HStack>
@@ -69,5 +65,3 @@ function FeedbackAdmin() {
     </Box>
   );
 }
-
-export default FeedbackAdmin;

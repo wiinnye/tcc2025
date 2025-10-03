@@ -10,7 +10,7 @@ import {
 } from "@chakra-ui/react";
 import { getAuth } from "firebase/auth";
 
-function FeedbackAluno() {
+export default function FeedbackAluno() {
   const [mensagem, setMensagem] = useState("");
   // const toast = useToast();
   const auth = getAuth();
@@ -79,5 +79,3 @@ function FeedbackAluno() {
     </Box>
   );
 }
-
-export default FeedbackAluno;
