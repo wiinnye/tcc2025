@@ -17,7 +17,7 @@ import { Categorias } from "./page/Categorias/Categorias";
 import { QuemSomos } from "./page/QuemSomos/QuemSomos";
 import { CadastroAdm } from "./page/CadastroAdm/cadastroAdm";
 import { RotaPrivada } from "./page/Rotas/RotaPrivada"
-import { FeedBack } from "./page/InteracaoAluno/interacaoAluno";
+import { FeedBack } from "./page/FeedBack/FeedBack";
 
 
 // 🔹 Componente de rota protegida
@@ -91,7 +91,7 @@ export default function App() {
             <Route path="/administrador" element={<Administrador />} />
             <Route path="/categorias" element={<Categorias />} />
             <Route path="/quemSomos" element={<QuemSomos />} />
-             <Route path="/feedback" element={<FeedBack />} />
+            <Route path="/feedback" element={<FeedBack />} />
 
             <Route path="*" element={<Home />} /> {/* fallback */}
           </>

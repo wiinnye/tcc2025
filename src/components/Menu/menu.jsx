@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { SpinnerPage } from "../Spinner/Spinner";
 import { MenuLink } from "../MenuLink/MenuLink";
 import { menusPorTipo } from "../../services/menu";
+import { NotificacaoFeedBackAluno } from "../NotificacaoFeedBackAluno/NotificacaoFeedBackAluno";
 
 export function MenuUsuario() {
   const [usuario, setUsuario] = useState(null);
@@ -26,6 +27,12 @@ export function MenuUsuario() {
   const navigate = useNavigate();
   const isMobile = useBreakpointValue({ base: true, md: false });
   const menus = menusPorTipo[usuario?.tipo] || [];
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  // useEffect(()=>{
+  //   setTimeout(() => 5000);
+  // },[])
 
   useEffect(() => {
     const buscarUsuario = async () => {
@@ -66,7 +73,6 @@ export function MenuUsuario() {
     >
       {carregando && <SpinnerPage />}
 
-      {/* terminou de carregar */}
       {!carregando && usuario && (
         <Flex w="100%" h="100%" justify="space-between" p={3} align="center">
           <Flex align="center" gap={3}>
@@ -170,6 +176,8 @@ export function MenuUsuario() {
           </Flex>
         </Flex>
       )}
+      
+      <NotificacaoFeedBackAluno user={user} onClose={() => 5000} />
     </Flex>
   );
 }
