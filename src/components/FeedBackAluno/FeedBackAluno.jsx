@@ -1,65 +1,60 @@
 import { useState } from "react";
 import { db } from "../../services/firebase";
+ import { doc, getDoc } from "firebase/firestore";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
-import {
-  Box,
-  Textarea,
-  Button,
-  VStack,
-  // useToast
-} from "@chakra-ui/react";
+import { Box, Textarea, Button, VStack } from "@chakra-ui/react";
 import { getAuth } from "firebase/auth";
+import { Notificacao } from "../Notificacao/Notificacao";
+import { NotificacaoFeedBackAluno } from "../NotificacaoFeedBackAluno/NotificacaoFeedBackAluno";
 
 export default function FeedbackAluno() {
   const [mensagem, setMensagem] = useState("");
-  // const toast = useToast();
+   const [usuario, setUsuario] = useState(null);
+  const [notificacao, setNotificacao] = useState(null);
   const auth = getAuth();
   const user = auth.currentUser;
+  const resize = "none";
 
-  const enviarFeedback = async () => {
-    if (!mensagem.trim()) {
-      // toast({
-      //   title: "Mensagem vazia",
-      //   description: "Digite algo antes de enviar.",
-      //   status: "warning",
-      //   duration: 3000,
-      //   isClosable: true,
-      // });
-      console.log("digite algo antes de enviar")
-      return;
-    }
+const enviarFeedback = async () => {
+  if (!mensagem.trim()) {
+    setNotificacao({
+      msg: "Digite seu Feedback antes de enviar",
+      tipo: "aviso",
+    });
+    return;
+  }
 
-    try {
-      await addDoc(collection(db, "feedbackAlunos"), {
+  try {
+    // busca o nome no Firestore
+    const userRef = doc(db, "usuarios", user.uid);
+    const userSnap = await getDoc(userRef);
+    const nomeUsuario = userSnap.exists() ? userSnap.data().nome : "Aluno";
+      if (userSnap.exists()) {
+            setUsuario(userSnap.data());
+          }
+
+    await addDoc(collection(db, "feedbackAlunos"), {
         userId: user.uid,
-        nome: user.displayName || "Aluno",
+        nome: nomeUsuario || "Aluno",
+        email: user.email,
         mensagem,
         criadoEm: serverTimestamp(),
         visto: false,
-        respondido: false
-      });
+        respondido: false,
+    });
 
-      setMensagem("");
-      // toast({
-      //   title: "Feedback enviado!",
-      //   description: "Seu feedback foi enviado para os intérpretes.",
-      //   status: "success",
-      //   duration: 3000,
-      //   isClosable: true,
-      // });
-      console.log("Seu feedback foi enviado para os intérpretes")
-    } catch (err) {
-      console.error("Erro ao enviar feedback:", err);
-      // toast({
-      //   title: "Erro",
-      //   description: "Não foi possível enviar seu feedback.",
-      //   status: "error",
-      //   duration: 3000,
-      //   isClosable: true,
-      // });
-      console.log("Não foi possível enviar seu feedback")
-    }
-  };
+    setMensagem("");
+    setNotificacao({
+      msg: "Seu feedback foi enviado! Obrigado",
+      tipo: "sucesso",
+    });
+  } catch (err) {
+    setNotificacao({
+      msg: "Não foi possível enviar seu feedback",
+      tipo: "erro",
+    });
+  }
+};
 
   return (
     <Box p={4} maxW="500px" mx="auto">
@@ -69,13 +64,24 @@ export default function FeedbackAluno() {
           value={mensagem}
           onChange={(e) => setMensagem(e.target.value)}
           size="lg"
+          h="100px"
+          resize={resize}
         />
-        <Button colorScheme="blue" w="full" 
-        onClick={enviarFeedback}
-        >
+        <Button bg="#4cb04c" w="150px" onClick={enviarFeedback}>
           Enviar Feedback
         </Button>
       </VStack>
+      {notificacao && (
+        <Notificacao
+          msg={notificacao?.msg}
+          tipo={notificacao?.tipo}
+          onClose={() => setNotificacao(null)}
+        />
+      )}
+
+      {usuario && (
+      <NotificacaoFeedBackAluno user={user} />
+   )} 
     </Box>
   );
 }

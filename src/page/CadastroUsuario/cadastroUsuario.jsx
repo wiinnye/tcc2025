@@ -60,13 +60,12 @@ export function CadastroUsuario() {
     setErroSenha("");
     setMensagem("Conta criada com sucesso!");
 
-    const resultInfoUsuario = {
-      nome: nomeUsuario,
-      email: emailUsuario,
-      senha: senha,
-    };
+    // const resultInfoUsuario = {
+    //   nome: nomeUsuario,
+    //   email: emailUsuario,
+    //   senha: senha,
+    // };
 
-    console.log(resultInfoUsuario);
 
     try {
       // Cria usuário no Firebase Authentication
@@ -85,11 +84,11 @@ export function CadastroUsuario() {
         tipo: "aluno", // 👈 aqui define o tipo: "aluno" ou "interprete"
       });
 
-      setMensagem("✅ Conta criada com sucesso!");
+      setMensagem("Conta criada com sucesso!");
       navigate("/login");
       console.log("Usuário salvo:", user.uid);
     } catch (erro) {
-      console.error("❌ Erro ao criar usuário:", erro);
+      console.error("Erro ao criar usuário:", erro);
       setErroSenha("Erro ao criar usuário. Verifique os dados.");
     }
   };
