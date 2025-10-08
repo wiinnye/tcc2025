@@ -7,8 +7,9 @@ import './index.css'
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <ChakraProvider value={system}>
+    <ChakraProvider value={system} >
       <App />
     </ChakraProvider>
   </StrictMode>
 );
+

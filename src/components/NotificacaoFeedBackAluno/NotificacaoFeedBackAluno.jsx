@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { db } from "../../services/firebase";
 import { collection, query, where, onSnapshot } from "firebase/firestore";
-import {  GridItem, Text, Grid } from "@chakra-ui/react";
+import { GridItem, Text, Grid } from "@chakra-ui/react";
 
 export function NotificacaoFeedBackAluno({ user, onClose }) {
   const [notificacao, setNotificacao] = useState("");
-  // const [visivel, setVisivel] = useState(true);
 
   useEffect(() => {
+
     const q = query(
       collection(db, "feedbackAlunos"),
       where("userId", "==", user.uid)
@@ -17,18 +17,27 @@ export function NotificacaoFeedBackAluno({ user, onClose }) {
       snapshot.docs.forEach((doc) => {
         const data = doc.data();
         if (data.visto) {
-          setNotificacao("Seu feedback foi lido pelo intérprete/adm");
+          setNotificacao("Seu feedback foi recebido e lido!");
         }
       });
     });
 
     return () => unsub();
-  }, [user.uid]);
+  }, [user]);
 
+  useEffect(() => {
+    if (notificacao) {
+      const timer = setTimeout(() => {
+        setNotificacao("");
+        if (onClose) onClose();
+      }, 5000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [notificacao, onClose]);
 
   return (
-    notificacao && (
-  <Grid
+    <Grid
       h="10%"
       position="fixed"
       bottom="150px"
@@ -41,13 +50,15 @@ export function NotificacaoFeedBackAluno({ user, onClose }) {
       boxShadow="md"
       zIndex={9999}
       justifyItems="center"
-      alignItems='center'
+      alignItems="center"
     >
-      <GridItem >
-      <Text fontSize="20px" >{notificacao}</Text>
-      <Text>Obrigado pelo feedback!</Text>
+      <GridItem>
+        <Text fontSize="20px">{notificacao}</Text>
+        <Text>Obrigado pelo feedback!</Text>
       </GridItem>
     </Grid>
-    )
   );
 }
+
+
+

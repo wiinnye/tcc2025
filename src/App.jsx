@@ -55,8 +55,6 @@ export default function App() {
     );
   }
 
-  console.log(usuario);
-
   return (
     <BrowserRouter>
       <Routes>
@@ -72,7 +70,7 @@ export default function App() {
           <>
             <Route path="/" element={<Home />} />
             
-            {/* 🔹 Apenas ADMIN pode acessar */}
+            {/* Apenas ADMIN pode acessar */}
             <Route
               path="/cadastroAdministrador"
               element={
