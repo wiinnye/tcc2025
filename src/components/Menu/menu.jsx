@@ -72,7 +72,6 @@ export function MenuUsuario() {
             <Flex
               align="center"
               justify="center"
-              bg="gray.300"
               borderRadius="full"
               w={{ sm: "32px", md: "50px", lg: "60px" }}
               h={{ sm: "32px", md: "50px", lg: "60px" }}

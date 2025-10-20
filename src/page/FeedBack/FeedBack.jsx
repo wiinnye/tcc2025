@@ -50,7 +50,7 @@ export function FeedBack() {
                 bg="#4cb04c"
                 mb={4}
                 onClick={() => {
-                  navigate("-1");
+                  navigate("/traducao");
                 }}
               >
                 <RiArrowLeftLine />

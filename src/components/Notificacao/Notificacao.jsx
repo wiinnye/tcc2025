@@ -1,11 +1,11 @@
 import { Text, Grid, GridItem } from "@chakra-ui/react";
 import { useEffect } from "react";
 
-export function Notificacao({ msg, tipo, onClose }) {
+export function Notificacao({ msg, tipo, descricao, onClose }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (onClose) onClose();
-    }, 5000);
+    }, 6000);
     return () => clearTimeout(timer);
   }, [onClose]);
 
@@ -35,6 +35,7 @@ export function Notificacao({ msg, tipo, onClose }) {
         <Text fontSize="18px" fontWeight="medium">
           {msg}
         </Text>
+        <Text>{descricao}</Text>
       </GridItem>
     </Grid>
   );
