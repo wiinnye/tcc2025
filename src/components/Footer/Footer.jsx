@@ -18,7 +18,7 @@ export function Footer() {
         px={{ base: 4, md: 12 }}
         py={6}
       >
-        <Flex gap={4}>
+        {/* <Flex gap={4}>
           <Link href="/quemsomos" _hover={{ textDecoration: "underline" }}>
             Quem Somos
           </Link>
@@ -28,7 +28,7 @@ export function Footer() {
           <Link href="#" _hover={{ textDecoration: "underline" }}>
             Políticas de Uso
           </Link>
-        </Flex>
+        </Flex> */}
         <Text fontSize="md" mt="1rem">
           © {new Date().getFullYear()} Projeto de LIBRAS. Todos os direitos
           reservados.

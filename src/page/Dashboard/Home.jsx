@@ -1,6 +1,6 @@
 import { Flex, Grid, GridItem, Image } from "@chakra-ui/react";
 import { MenuUsuario } from "../../components/Menu/menu";
-import bannerPrincipal from "../../image/bannerMenor.png";
+import bannerPrincipal from "../../image/banner.png";
 import { Footer } from "../../components/Footer/Footer";
 import { CardCategoria } from "../../components/CardCategoria/CardCategoria";
 
