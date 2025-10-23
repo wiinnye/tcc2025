@@ -1,8 +1,8 @@
 import { Box, Flex, Grid, GridItem, Image, Text } from "@chakra-ui/react";
-import { MenuUsuario } from "../../components/Menu/menu";
+import MenuUsuario from "../../components/Menu/Menu";
 import { useEffect, useState } from "react";
 import { SpinnerPage } from "../../components/Spinner/Spinner";
-import { Footer } from "../../components/Footer/Footer";
+import Footer  from "../../components/Footer/Footer";
 import rostoQuem1 from "../../image/rostoQuemos (1).png";
 import rostoQuem2 from "../../image/rostoQuemos (2).png";
 import rostoQuem3 from "../../image/rostoQuemos (3).png";

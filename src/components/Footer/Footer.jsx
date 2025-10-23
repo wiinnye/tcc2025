@@ -1,6 +1,6 @@
-import { Flex, Text, Link } from "@chakra-ui/react";
+import { Flex, Text } from "@chakra-ui/react";
 
-export function Footer() {
+export default function Footer() {
   return (
     <Flex
       bg="#6AB04C"

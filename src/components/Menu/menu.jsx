@@ -7,6 +7,7 @@ import {
   Drawer,
   Portal,
   useBreakpointValue,
+  Icon,
 } from "@chakra-ui/react";
 import { FaUserCircle } from "react-icons/fa";
 import { RiMenuFill } from "react-icons/ri";
@@ -18,8 +19,10 @@ import { useNavigate } from "react-router-dom";
 import { SpinnerPage } from "../Spinner/Spinner";
 import { MenuLink } from "../MenuLink/MenuLink";
 import { menusPorTipo } from "../../services/menu";
+import { IoLogInOutline } from "react-icons/io5";
+import  ToolTipContainer  from "../ToolTip/ToolTip";
 
-export function MenuUsuario() {
+export default function MenuUsuario() {
   const [usuario, setUsuario] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [open, setOpen] = useState(false);
@@ -57,13 +60,7 @@ export function MenuUsuario() {
   };
 
   return (
-    <Flex
-      w="100%"
-      h="100%"
-      bg="#4cb04c"
-      direction="column"
-      boxShadow="sm"
-    >
+    <Flex w="100%" h="100%" bg="#4cb04c" direction="column" boxShadow="sm">
       {carregando && <SpinnerPage />}
 
       {!carregando && usuario && (
@@ -90,14 +87,17 @@ export function MenuUsuario() {
               </Text>
             </Box>
           </Flex>
-          <Text
-            cursor="pointer"
-            color="#fff"
-            fontSize={{ sm: "18px", md: "24px", lg: "24px" }}
-            onClick={handleLogout}
-          >
-            Sair da conta
-          </Text>
+          <ToolTipContainer descricao='sair da conta'>
+            <Button
+                  cursor="pointer"
+                  color="#fff"
+                  pr="1.5rem"
+                  bg="#4cb04c"
+                  onClick={handleLogout}
+                >
+                  <Icon as={IoLogInOutline} w={10} h={10} />
+            </Button>
+        </ToolTipContainer>
         </Flex>
       )}
 
@@ -121,7 +121,7 @@ export function MenuUsuario() {
       )}
 
       {menus.length > 0 && isMobile && (
-        <Flex w="100%" h="100%" bg="#FFCCCC" align='center'>
+        <Flex w="100%" h="100%" bg="#FFCCCC" align="center">
           <Drawer.Root open={open} onOpenChange={(e) => setOpen(e.open)}>
             <Drawer.Trigger asChild>
               <Button bg="#FFCCCC" size="lg">
@@ -152,23 +152,17 @@ export function MenuUsuario() {
       )}
 
       {!carregando && !usuario && (
-        <Flex w="100%" h="100%" justify="space-between" p={5} align="center">
+        <Flex w="100%" h="100%" justify="space-between" p={4} align="center">
           <Flex w="100%" justify="space-between">
             <Text fontSize="sm" color="gray.100">
               Usuário não encontrado
             </Text>
-            <Text
-              cursor="pointer"
-              color="#fff"
-              fontSize={{ sm: "18px", md: "24px", lg: "24px" }}
-              onClick={handleLogout}
-            >
-              Sair da conta
-            </Text>
+            <Button cursor="pointer" color="#fff" onClick={handleLogout}>
+              <IoLogInOutline />
+            </Button>
           </Flex>
         </Flex>
       )}
-      
-      </Flex>
+    </Flex>
   );
 }

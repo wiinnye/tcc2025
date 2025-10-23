@@ -3,13 +3,14 @@ import { useEffect, useState } from "react";
 import { Flex, Text, Image, Button, Grid, GridItem, Box, Input } from "@chakra-ui/react";
 import { db } from "../../services/firebase";
 import { doc, getDoc,updateDoc } from "firebase/firestore";
-import { MenuUsuario } from "../../components/Menu/menu";
+import MenuUsuario  from "../../components/Menu/Menu";
 import { RiCloseFill, RiArrowLeftLine } from "react-icons/ri";
 import { SpinnerPage } from "../../components/Spinner/Spinner";
-import { Footer } from "../../components/Footer/Footer"
+import Footer from "../../components/Footer/Footer"
 import { getAuth } from "firebase/auth";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { Notificacao } from "../../components/Notificacao/Notificacao";
+import  ToolTipContainer  from "../../components/ToolTip/ToolTip";
 
 export function VideoMostrar() {
   const { categoria } = useParams();
@@ -98,10 +99,11 @@ useEffect(() => {
       </GridItem> 
       <GridItem w="100%" h="100%" mt={{lg:'4rem'}} p='5'>
         <Flex 
-        w="100%"
-        justify='space-between'
-        align={{base:"start",lg:'center'}}
-        gap={{base:"3"}}>
+          w="100%"
+          justify='space-between'
+          align={{base:"start",lg:'center'}}
+          gap={{base:"3"}}>
+          <ToolTipContainer descricao='voltar pagina'>
             <Button
             w={{ base: "15%", lg: "10%" }}
             bg="#4cb04c"
@@ -111,6 +113,7 @@ useEffect(() => {
           >
             <RiArrowLeftLine />
           </Button>
+          </ToolTipContainer>
           <Input
           placeholder="Buscar vídeo pelo nome..."
           value={busca}
@@ -217,12 +220,14 @@ useEffect(() => {
                 <Text fontWeight="bold" fontSize="xl">
                   {videoSelecionado.titulo.toUpperCase()}
                 </Text>
+                <ToolTipContainer descricao='fechar'>
                 <RiCloseFill
                   color="#6AB04C"
                   cursor="pointer"
                   size="30px"
                   onClick={() => setVideoSelecionado(null)}
                 />
+                </ToolTipContainer>
               </Flex>
               <video
                 style={{
