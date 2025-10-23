@@ -3,11 +3,12 @@ import { useNavigate } from "react-router-dom";
 import { Button, Flex, Grid, GridItem, Text } from "@chakra-ui/react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
-import { MenuUsuario } from "../../components/Menu/menu";
+import MenuUsuario  from "../../components/Menu/Menu";
 import bgCategoria from "../../image/bgCategoria.png";
 import { SpinnerPage } from "../../components/Spinner/Spinner";
-import { Footer } from "../../components/Footer/Footer";
+import Footer from "../../components/Footer/Footer";
 import { RiArrowLeftLine } from "react-icons/ri";
+import ToolTipContainer from "../../components/ToolTip/ToolTip";
 
 export function Categorias() {
   const [categorias, setCategorias] = useState([]);
@@ -59,6 +60,7 @@ export function Categorias() {
       </GridItem>
       <GridItem w="100%">
           <Flex w="100%" direction='column' justify="center" p='2rem'>
+        <ToolTipContainer descricao='voltar pagina'>
           <Button
           w={{ base: "15%", lg: "10%" }}
           bg="#4cb04c"
@@ -76,6 +78,7 @@ export function Categorias() {
         >
           Confira as Trilhas Disponíveis:
         </Text>
+        </ToolTipContainer>
         </Flex>
       </GridItem>
       <GridItem w="100%" h="100%">

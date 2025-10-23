@@ -7,6 +7,7 @@ import {
   Text,
   useBreakpointValue,
 } from "@chakra-ui/react";
+import ToolTipContainer from '../../components/ToolTip/ToolTip'
 import bgFuntlibra from "../../image/bgFuntlibra.png";
 import { useState } from "react";
 import { IoEyeOff, IoEyeSharp } from "react-icons/io5";
@@ -170,10 +171,12 @@ export function CadastroInterprete() {
           position="relative"
           zIndex={1}
         >
-          <Flex w="100%" h="20%" justify="start" align="center" pl="2rem">
+          <Flex w="100%" h="20%" justify="start" align="center" pl="2rem">  
+          <ToolTipContainer descricao='voltar pagina'>
             <Button w="100px" bg="#579b3e" onClick={() => navigate("/login")}>
               <RiArrowLeftLine />
             </Button>
+            </ToolTipContainer>
           </Flex>
           <Flex
             w={{ base: "300px", s: "150px", md: "350px", lg: "500px" }}

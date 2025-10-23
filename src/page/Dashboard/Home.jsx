@@ -1,7 +1,7 @@
 import { Flex, Grid, GridItem, Image } from "@chakra-ui/react";
-import { MenuUsuario } from "../../components/Menu/menu";
+import MenuUsuario  from "../../components/Menu/Menu";
 import bannerPrincipal from "../../image/banner.png";
-import { Footer } from "../../components/Footer/Footer";
+import Footer from "../../components/Footer/Footer";
 import { CardCategoria } from "../../components/CardCategoria/CardCategoria";
 
 export function Home() {

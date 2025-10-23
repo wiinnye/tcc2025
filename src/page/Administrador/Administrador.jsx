@@ -18,8 +18,9 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import { MenuUsuario } from "../../components/Menu/menu";
+import MenuUsuario  from "../../components/Menu/Menu";
 import { Notificacao } from "../../components/Notificacao/Notificacao";
+import ToolTipContainer from '../../components/ToolTip/ToolTip'
 import { FaRegTrashAlt } from "react-icons/fa";
 import { RiCloseFill, RiArrowLeftLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
@@ -138,18 +139,20 @@ return (
         p={{ base: ".6rem", md: "1rem" }}
         mt={{ base: "3rem", md: "2rem" }}
       >
-        <Button
-          w={{ base: "20%", md: "10%" }}
-          bg="#4cb04c"
-          mb={4}
-          onClick={() => {
-            navigate("/tradutor")
-          }}
-        >
-          <RiArrowLeftLine />
-        </Button>
+        <ToolTipContainer descricao='voltar pagina'>
+          <Button
+            w={{ base: "20%", md: "10%" }}
+            bg="#4cb04c"
+            mb={4}
+            onClick={() => {
+              navigate("/tradutor")
+            }}
+          >
+            <RiArrowLeftLine />
+          </Button>
+          </ToolTipContainer>
       </GridItem>):
-   <GridItem
+  <GridItem
         w="100%"
         h="100"
         p={{ base: ".6rem", md: "1rem" }}

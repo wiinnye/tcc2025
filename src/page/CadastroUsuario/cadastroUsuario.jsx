@@ -15,6 +15,7 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { RiArrowLeftLine } from "react-icons/ri";
+import ToolTipContainer  from "../../components/ToolTip/ToolTip";
 
 export function CadastroUsuario() {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -32,43 +33,31 @@ export function CadastroUsuario() {
   const handleSubmit = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    // 1️⃣ Verificar se todos os campos estão preenchidos
     if (!nomeUsuario || !emailUsuario || !senha || !confirmarSenha) {
       setErroSenha("Preencha todos os campos!");
       return;
     }
 
-    // 2️⃣ Validar se o email é válido
     if (!emailRegex.test(emailUsuario)) {
       setErroSenha("Digite um e-mail válido!");
       return;
     }
 
-    // 3️⃣ Verificar se a senha tem no mínimo 6 caracteres
     if (senha.length < 6 || confirmarSenha.length < 6) {
       setErroSenha("A senha precisa ter no mínimo 6 caracteres.");
       return;
     }
 
-    // 4️⃣ Verificar se as senhas são iguais
     if (senha !== confirmarSenha) {
       setErroSenha("As senhas não são iguais.");
       return;
     }
 
-    // ✅ Se tudo estiver certo, limpa os erros e envia os dados
     setErroSenha("");
     setMensagem("Conta criada com sucesso!");
 
-    // const resultInfoUsuario = {
-    //   nome: nomeUsuario,
-    //   email: emailUsuario,
-    //   senha: senha,
-    // };
-
-
     try {
-      // Cria usuário no Firebase Authentication
+
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         emailUsuario,
@@ -76,12 +65,11 @@ export function CadastroUsuario() {
       );
       const user = userCredential.user;
 
-      // Salva no Firestore
       await setDoc(doc(db, "usuarios", user.uid), {
         nome: nomeUsuario,
         email: emailUsuario,
         senha: senha,
-        tipo: "aluno", // 👈 aqui define o tipo: "aluno" ou "interprete"
+        tipo: "aluno",
       });
 
       setMensagem("Conta criada com sucesso!");
@@ -126,9 +114,11 @@ export function CadastroUsuario() {
           zIndex={1}
         >
           <Flex w="100%" h="20%" justify="start" align="center" pl="2rem">
+          <ToolTipContainer descricao='voltar pagina'>
             <Button w="100px" bg="#579b3e" onClick={() => navigate("/login")}>
               <RiArrowLeftLine />
             </Button>
+            </ToolTipContainer>
           </Flex>
           <Flex
             w={{ base: "300px", md: "350px", lg: "500px" }}
