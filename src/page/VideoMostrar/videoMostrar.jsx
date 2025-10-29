@@ -82,9 +82,9 @@ useEffect(() => {
       const novaLista = (data.lista || []).filter(v => v.url !== video.url); 
       
       await updateDoc(docRef, { lista: novaLista });
-      setVideos(novaLista); // atualiza estado
+      setVideos(novaLista); 
 
-    setNotificacao(true) // ativa a notidficação
+    setNotificacao(true) 
     navigate('/categorias')
     }
   } catch (erro) {

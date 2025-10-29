@@ -212,6 +212,7 @@ return (
                       fontWeight="bold"
                       mb={2}
                       color="#6AB04C"
+                      className="notranslate"
                     >
                       {cat.nome.toUpperCase()}
                     </Text>
@@ -247,12 +248,12 @@ return (
                         />
 
                         <Flex minW="50%" mt="1rem" p=".4rem" direction="column" >
-                          <Text fontWeight="bold" fontSize="lg" >
+                          <Text fontWeight="bold" fontSize="lg" className="notranslate" >
                             {v.titulo.toUpperCase()}
                           </Text>
-                          {/* <Text fontSize="sm" color="gray.500">
+                          <Text fontSize="sm" color="gray.500">
                             Intérprete: {v.interpete || "Não informado"}
-                          </Text> */}
+                          </Text>
                           <Text fontSize="sm" color="gray.500">
                             Enviado por: {v.interpreteEmail || "Não informado"}
                           </Text>

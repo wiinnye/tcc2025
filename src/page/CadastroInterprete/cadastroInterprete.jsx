@@ -7,7 +7,7 @@ import {
   Text,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import ToolTipContainer from '../../components/ToolTip/ToolTip'
+import ToolTipContainer from "../../components/ToolTip/ToolTip";
 import bgFuntlibra from "../../image/bgFuntlibra.png";
 import { useState } from "react";
 import { IoEyeOff, IoEyeSharp } from "react-icons/io5";
@@ -17,6 +17,7 @@ import InputMask from "react-input-mask";
 import { useNavigate } from "react-router-dom";
 import { doc, setDoc } from "firebase/firestore";
 import { RiArrowLeftLine } from "react-icons/ri";
+import {Notificacao} from "../../components/Notificacao/Notificacao";
 
 export function CadastroInterprete() {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -27,11 +28,14 @@ export function CadastroInterprete() {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [showSenha, setShowSenha] = useState(false);
   const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
-  const [erroSenha, setErroSenha] = useState("");
-  const [mensagem, setMensagem] = useState("");
+  const [notificacao, setNotificacao] = useState("");
   const [cpfInterprete, setEmailCpfInterprete] = useState("");
   const [cdiInterprete, setCdiInterprete] = useState("");
   const [erroCpf, setErroCpf] = useState("");
+  const [erroSenha, setErroSenha] = useState("");
+  const [erroEmail, setErroEmail] = useState("");
+  const [erroCDI, setErroCDI] = useState("");
+  const [erroCampos, setErroCampos] = useState("");
 
   function validarCPF(cpf) {
     cpf = cpfInterprete.replace(/[^\d]+/g, ""); // Remove pontos e traços
@@ -68,12 +72,12 @@ export function CadastroInterprete() {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!nomeInterprete || !emailInterprete || !senha || !confirmarSenha) {
-      setErroSenha("Preencha todos os campos!");
+      setErroCampos("Preencha todos os campos!");
       return;
     }
 
     if (!emailRegex.test(emailInterprete)) {
-      setErroSenha("Digite um e-mail válido!");
+      setErroEmail("Digite um e-mail válido!");
       return;
     }
 
@@ -81,6 +85,12 @@ export function CadastroInterprete() {
       setErroSenha("A senha precisa ter no mínimo 6 caracteres.");
       return;
     }
+
+    if (cdiInterprete.length < 10 ) {
+      setErroCDI("A CDI precisa ter no mínimo 10 caracteres.");
+      return;
+    }
+
 
     if (senha !== confirmarSenha) {
       setErroSenha("As senhas não são iguais.");
@@ -99,16 +109,9 @@ export function CadastroInterprete() {
 
     setErroCpf("");
     setErroSenha("");
-    setMensagem("Conta criada com sucesso!");
-
-    const resultInfoInterprete = {
-      nome: nomeInterprete,
-      email: emailInterprete,
-      cdi: cdiInterprete,
-      senha: senha,
-    };
-
-    console.log(resultInfoInterprete);
+    setErroCDI("");
+    setErroCampos("")
+    setErroEmail("")
 
     try {
       // Cria usuário no Firebase Authentication
@@ -128,16 +131,23 @@ export function CadastroInterprete() {
         cdi: cdiInterprete,
         cpf: cpfInterprete,
         senha: senha,
-        tipo: "interprete", // 👈 aqui define o tipo: "aluno" ou "interprete"
+        tipo: "interprete",
       });
 
-      setMensagem("✅ Conta criada com sucesso!");
-      navigate("/login");
-      console.log("Usuário salvo:", user.uid);
+      setNotificacao({ msg: "Conta criada com sucesso!", tipo: "sucesso" });
     } catch (erro) {
-      console.error("❌ Erro ao criar usuário:", erro);
-      setErroSenha("Erro ao criar usuário. Verifique os dados.");
+      if (erro.code === 'auth/email-already-in-use') {
+      setNotificacao({
+        msg:'Este E-mail já está cadastrado!',
+        descricao:"Tente fazer login ou use outro E-mail",
+        tipo:"erro"})
+    }else {
+      setNotificacao({
+        msg: "Erro ao criar usuário. Verifique os dados!",
+        tipo: "erro",
+      });
     }
+  }
   };
 
   return (
@@ -171,17 +181,17 @@ export function CadastroInterprete() {
           position="relative"
           zIndex={1}
         >
-          <Flex w="100%" h="20%" justify="start" align="center" pl="2rem">  
-          <ToolTipContainer descricao='voltar pagina'>
-            <Button w="100px" bg="#579b3e" onClick={() => navigate("/login")}>
-              <RiArrowLeftLine />
-            </Button>
+          <Flex w="100%" h="20%" justify="start" align="center" pl="2rem">
+            <ToolTipContainer descricao="voltar pagina">
+              <Button w="100px" bg="#579b3e" onClick={() => navigate("/login")}>
+                <RiArrowLeftLine />
+              </Button>
             </ToolTipContainer>
           </Flex>
           <Flex
             w={{ base: "300px", s: "150px", md: "350px", lg: "500px" }}
             h="500px"
-            alignItems={"center"}
+            // alignItems={"center"}
             alignContent={"center"}
             justify={"center"}
             flexDirection="column"
@@ -207,8 +217,9 @@ export function CadastroInterprete() {
               w={{ base: "200px", md: "250px", lg: "350px" }}
               mb="1rem"
               placeholder="Nome Completo"
+              alignSelf='center'
               padding=".5rem"
-              borderColor="#DEF5DE"
+              borderColor={!erroCampos ? "#DEF5DE" : "red"}
               value={nomeInterprete}
               onChange={(e) => setNomeInterprete(e.target.value)}
             />
@@ -217,42 +228,69 @@ export function CadastroInterprete() {
               mb="1rem"
               placeholder="Email"
               padding=".5rem"
-              borderColor="#DEF5DE"
+              alignSelf='center'
+              borderColor={!erroEmail && !erroCampos ? "#DEF5DE" : "red"}
               value={emailInterprete}
               onChange={(e) => setEmailInterprete(e.target.value)}
             />
+            {erroEmail && (
+              <Text color="red" fontSize="sm" ml="4.7rem" mb="1rem">
+                {erroEmail}
+              </Text>
+            )}
+            <Flex
+              alignSelf='center'
+              alignItems='center'
+              justify='space-around'
+              px='.5rem'
+            >
             <Input
-              w={{ base: "200px", md: "250px", lg: "350px" }}
+              w={{ base: "200px", md: "250px", lg: "50%" }}
               mb="1rem"
               placeholder="CDI"
-              padding=".5rem"
-              borderColor="#DEF5DE"
+              pr='.5rem'
+              borderColor={!erroCDI && !erroCampos ? "#DEF5DE" : "red"}
               value={cdiInterprete}
               onChange={(e) => setCdiInterprete(e.target.value)}
             />
+            
             <Input
-              w={{ base: "200px", md: "250px", lg: "350px" }}
+              w={{ base: "200px", md: "250px", lg: "50%" }}
               mb="1rem"
               as={InputMask}
               mask="999.999.999-99"
               placeholder="CPF"
-              padding=".5rem"
-              borderColor="#DEF5DE"
+              ml=".5rem"
+              borderColor={!erroCpf && !erroCampos ? "#DEF5DE" : "red"}
               error={erroCpf}
               value={cpfInterprete}
               onChange={(e) => setEmailCpfInterprete(e.target.value)}
             />
+            </Flex>
+
+               {erroCpf && (
+              <Text color="red" fontSize="sm" ml="52%" mb="1rem">
+                {erroCpf}
+              </Text>
+            )}
+             {erroCDI && (
+              <Text color="red" fontSize="sm" ml="4.7rem" mb="1rem">
+                {erroCDI}
+              </Text>
+            )}
+
             {/* Senha */}
             <Box
               position="relative"
               w={{ base: "200px", md: "250px", lg: "350px" }}
               mb="1rem"
+              alignSelf='center'
             >
               <Input
                 type={showSenha ? "text" : "password"}
                 placeholder="Senha"
                 padding=".5rem"
-                borderColor={!erroSenha ? "#DEF5DE" : "red"}
+                borderColor={!erroSenha && !erroCampos ? "#DEF5DE" : "red"}
                 w="100%"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
@@ -278,12 +316,13 @@ export function CadastroInterprete() {
               position="relative"
               w={{ base: "200px", md: "250px", lg: "350px" }}
               mb="1rem"
+              alignSelf='center'
             >
               <Input
                 type={showConfirmarSenha ? "text" : "password"}
                 placeholder="Confirmar Senha"
                 padding=".5rem"
-                borderColor={!erroSenha ? "#DEF5DE" : "red"}
+                borderColor={!erroSenha && !erroCampos ? "#DEF5DE" : "red"}
                 w="100%"
                 value={confirmarSenha}
                 onChange={(e) => setConfirmarSenha(e.target.value)}
@@ -303,30 +342,33 @@ export function CadastroInterprete() {
                 )}
               </Box>
             </Box>
-
             {erroSenha && (
-              <Text color="red" fontSize="sm" mb="1rem">
+              <Text color="red" fontSize="sm" ml="4.7rem" mb="1rem">
                 {erroSenha}
               </Text>
             )}
 
-            {mensagem && (
-              <Box
-                bg={mensagem.includes("❌") ? "red.100" : "green.100"}
-                color={mensagem.includes("❌") ? "red.600" : "green.600"}
-                p={2}
-                borderRadius="md"
-                textAlign="center"
-                mb="1rem"
-              >
-                {mensagem}
-              </Box>
+            {erroCampos && (
+              <Text color="red" fontSize="sm" ml="4.7rem" mb="1rem">
+                {erroCampos}
+              </Text>
             )}
+
+            {notificacao && (
+              <Notificacao
+                msg={notificacao?.msg}
+                tipo={notificacao?.tipo}
+                descricao={notificacao?.descricao}
+                onClose={() => setNotificacao(null)}
+              />
+            )}
+
             <Button
               w={{ base: "200px", md: "250px", lg: "350px" }}
               mb="1rem"
               bg={"#6AB04C"}
               color="#fff"
+              alignSelf='center'
               onClick={handleSubmit}
             >
               Criar
