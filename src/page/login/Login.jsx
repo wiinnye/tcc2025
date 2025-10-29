@@ -43,7 +43,7 @@ export function Login() {
   if (!emailValue || !senhaValue) return;
 
   if (!validarEmail(emailValue)) {
-    setErroEmail("Digite um email válido");
+    setErroEmail("Digite um e-mail válido");
     return;
   }
 
@@ -69,7 +69,6 @@ export function Login() {
     setMensagem("Login bem-sucedido!");
     navigate("/traducao");
   } catch (error) {
-    console.log(error)
     setCarregando(false)
     if (error.code === "auth/invalid-email") {
       setErroEmail("Email inválido");

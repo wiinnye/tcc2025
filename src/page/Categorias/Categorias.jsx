@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { Button, Flex, Grid, GridItem, Text } from "@chakra-ui/react";
 import { doc, getDoc } from "firebase/firestore";
 import { db } from "../../services/firebase";
-import MenuUsuario  from "../../components/Menu/Menu";
+import MenuUsuario from "../../components/Menu/Menu";
 import bgCategoria from "../../image/bgCategoria.png";
 import { SpinnerPage } from "../../components/Spinner/Spinner";
 import Footer from "../../components/Footer/Footer";
@@ -18,19 +18,16 @@ export function Categorias() {
   useEffect(() => {
     const buscarCategorias = async () => {
       try {
-        const docRef = doc(db, "videos", "libra"); // único documento
+        const docRef = doc(db, "videos", "libra");
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           const data = docSnap.data();
 
-          // 🚩 NOVO: acessa a lista diretamente
           const listaVideos = data.lista || [];
 
-          // Pega todas as categorias dos vídeos
           const todasCategorias = listaVideos.map((video) => video.categoria);
 
-          // Remove duplicadas (ignorando maiúsculas/minúsculas)
           const categoriasMap = new Map();
           todasCategorias.forEach((cat) => {
             const chave = cat.trim().toLowerCase();
@@ -59,26 +56,26 @@ export function Categorias() {
         <MenuUsuario />
       </GridItem>
       <GridItem w="100%">
-          <Flex w="100%" direction='column' justify="center" p='2rem'>
-        <ToolTipContainer descricao='voltar pagina'>
-          <Button
-          w={{ base: "15%", lg: "10%" }}
-          bg="#4cb04c"
-          mb={4}
-          onClick={() => {
-            navigate("/tradutor");
-          }}
-        >
-          <RiArrowLeftLine />
-        </Button>
-        <Text
-          fontSize={{ base: "xl", md: "2xl" }}
-          fontWeight="bold"
-          textAlign="center"
-        >
-          Confira as Trilhas Disponíveis:
-        </Text>
-        </ToolTipContainer>
+        <Flex w="100%" direction="column" justify="center" p="2rem">
+          <ToolTipContainer descricao="voltar pagina">
+            <Button
+              w={{ base: "15%", lg: "10%" }}
+              bg="#4cb04c"
+              mb={4}
+              onClick={() => {
+                navigate("/tradutor");
+              }}
+            >
+              <RiArrowLeftLine />
+            </Button>
+          </ToolTipContainer>
+          <Text
+              fontSize={{ base: "xl", md: "2xl" }}
+              fontWeight="bold"
+              textAlign="center"
+            >
+              Confira as Linguagens Disponíveis:
+            </Text>
         </Flex>
       </GridItem>
       <GridItem w="100%" h="100%">
@@ -98,12 +95,12 @@ export function Categorias() {
                 <Flex
                   key={index}
                   cursor="pointer"
-                  w={{ base: "120px", md: "200px", lg:'300px' }}
-                  h={{ base: "120px", md: "50%", lg:'100%' }}
+                  w={{ base: "120px", md: "200px", lg: "300px" }}
+                  h={{ base: "120px", md: "50%", lg: "100%" }}
                   direction="column"
                   align="center"
                   justify="center"
-                  p='3rem'
+                  p="3rem"
                   _hover={{ transform: "scale(1.05)", transition: "0.3s" }}
                   backgroundImage={`url(${bgCategoria})`}
                   backgroundSize="contain"
@@ -115,8 +112,9 @@ export function Categorias() {
                     mb={{ base: "3rem", md: "124px", lg: "110px" }}
                     fontWeight="bold"
                     color="#fff"
-                    fontSize={{base:'md',md:'24px',lg:"26px"}}
+                    fontSize={{ base: "md", md: "24px", lg: "26px" }}
                     textAlign="start"
+                    className="notranslate"
                   >
                     {categoria.toUpperCase()}
                   </Text>
@@ -126,7 +124,7 @@ export function Categorias() {
           </>
         )}
       </GridItem>
-      <GridItem >
+      <GridItem>
         <Footer />
       </GridItem>
     </Grid>

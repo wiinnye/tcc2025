@@ -15,7 +15,8 @@ import { createUserWithEmailAndPassword } from "firebase/auth";
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { RiArrowLeftLine } from "react-icons/ri";
-import ToolTipContainer  from "../../components/ToolTip/ToolTip";
+import ToolTipContainer from "../../components/ToolTip/ToolTip";
+import { Notificacao } from "../../components/Notificacao/Notificacao";
 
 export function CadastroUsuario() {
   const isMobile = useBreakpointValue({ base: true, md: false });
@@ -28,18 +29,21 @@ export function CadastroUsuario() {
   const [showSenha, setShowSenha] = useState(false);
   const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
   const [erroSenha, setErroSenha] = useState("");
-  const [mensagem, setMensagem] = useState("");
+  const [erroCampos, setErroCampos] = useState("");
+  const [erroEmail, setErroEmail] = useState("");
+  const [erroConfirmaSenha, setConfirmaSenha] = useState("");
+  const [notificacao, setNotificacao] = useState("");
 
   const handleSubmit = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     if (!nomeUsuario || !emailUsuario || !senha || !confirmarSenha) {
-      setErroSenha("Preencha todos os campos!");
+      setErroCampos("Preencha todos os campos!");
       return;
     }
 
     if (!emailRegex.test(emailUsuario)) {
-      setErroSenha("Digite um e-mail válido!");
+      setErroEmail("Digite um e-mail válido!");
       return;
     }
 
@@ -49,15 +53,15 @@ export function CadastroUsuario() {
     }
 
     if (senha !== confirmarSenha) {
-      setErroSenha("As senhas não são iguais.");
+      setConfirmaSenha("As senhas não são iguais.");
       return;
     }
 
     setErroSenha("");
-    setMensagem("Conta criada com sucesso!");
-
+    setConfirmaSenha("");
+    setErroCampos("")
+    setErroEmail("")
     try {
-
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         emailUsuario,
@@ -72,12 +76,21 @@ export function CadastroUsuario() {
         tipo: "aluno",
       });
 
-      setMensagem("Conta criada com sucesso!");
-      navigate("/login");
-      console.log("Usuário salvo:", user.uid);
+      setNotificacao({msg:"Conta criada com sucesso!", tipo:"sucesso"});
+
     } catch (erro) {
-      console.error("Erro ao criar usuário:", erro);
-      setErroSenha("Erro ao criar usuário. Verifique os dados.");
+      if (erro.code === "auth/email-already-in-use") {
+        setNotificacao({
+          msg: "Este E-mail já está cadastrado!",
+          descricao: "Tente fazer login ou use outro E-mail",
+          tipo: "erro",
+        });
+      } else {
+        setNotificacao({
+          msg: "Erro ao criar usuário. Verifique os dados.",
+          tipo: "erro",
+        });
+      }
     }
   };
 
@@ -114,17 +127,16 @@ export function CadastroUsuario() {
           zIndex={1}
         >
           <Flex w="100%" h="20%" justify="start" align="center" pl="2rem">
-          <ToolTipContainer descricao='voltar pagina'>
-            <Button w="100px" bg="#579b3e" onClick={() => navigate("/login")}>
-              <RiArrowLeftLine />
-            </Button>
+            <ToolTipContainer descricao="voltar pagina">
+              <Button w="100px" bg="#579b3e" onClick={() => navigate("/login")}>
+                <RiArrowLeftLine />
+              </Button>
             </ToolTipContainer>
           </Flex>
           <Flex
             w={{ base: "300px", md: "350px", lg: "500px" }}
             h="auto"
             p="2rem"
-            alignItems="center"
             justify="center"
             flexDirection="column"
             bg="#F3F5FC"
@@ -146,7 +158,8 @@ export function CadastroUsuario() {
               mb="1rem"
               placeholder="Nome Completo"
               padding=".5rem"
-              borderColor="#DEF5DE"
+              alignSelf='center'
+              borderColor={!erroCampos ? "#DEF5DE" : "red"}
               value={nomeUsuario}
               onChange={(e) => setNomeUsuario(e.target.value)}
             />
@@ -154,23 +167,30 @@ export function CadastroUsuario() {
               w={{ base: "200px", md: "250px", lg: "350px" }}
               mb="1rem"
               placeholder="Email"
+              alignSelf='center'
               padding=".5rem"
-              borderColor="#DEF5DE"
+              borderColor={!erroEmail && !erroCampos ? "#DEF5DE" : "red"}
               value={emailUsuario}
               onChange={(e) => setEmailUsuario(e.target.value)}
             />
+              {erroEmail && (
+              <Text color="red" fontSize="sm" ml="2.7rem" mb="1rem">
+                {erroEmail}
+              </Text>
+            )}
 
             {/* Senha */}
             <Box
               position="relative"
               w={{ base: "200px", md: "250px", lg: "350px" }}
               mb="1rem"
+              alignSelf='center'
             >
               <Input
                 type={showSenha ? "text" : "password"}
                 placeholder="Senha"
                 padding=".5rem"
-                borderColor={!erroSenha ? "#DEF5DE" : "red"}
+                borderColor={!erroSenha && !erroCampos ? "#DEF5DE" : "red"}
                 w="100%"
                 value={senha}
                 onChange={(e) => setSenha(e.target.value)}
@@ -190,18 +210,26 @@ export function CadastroUsuario() {
                 )}
               </Box>
             </Box>
+            {erroSenha && (
+              <Text color="red" fontSize="sm" ml="2.7rem" mb="1rem">
+                {erroSenha}
+              </Text>
+            )}
 
             {/* Confirmar Senha */}
             <Box
               position="relative"
               w={{ base: "200px", md: "250px", lg: "350px" }}
               mb="1rem"
+              alignSelf='center'
             >
               <Input
                 type={showConfirmarSenha ? "text" : "password"}
                 placeholder="Confirmar Senha"
                 padding=".5rem"
-                borderColor={!erroSenha ? "#DEF5DE" : "red"}
+                borderColor={
+                  !erroConfirmaSenha && !erroCampos ? "#DEF5DE" : "red"
+                }
                 w="100%"
                 value={confirmarSenha}
                 onChange={(e) => setConfirmarSenha(e.target.value)}
@@ -221,33 +249,34 @@ export function CadastroUsuario() {
                 )}
               </Box>
             </Box>
-
-            {erroSenha && (
-              <Text color="red" fontSize="sm" mb="1rem">
-                {erroSenha}
+            {erroConfirmaSenha && (
+              <Text color="red" fontSize="sm" ml="2.7rem" mb="1rem">
+                {erroConfirmaSenha}
               </Text>
             )}
 
-            {mensagem && (
-              <Box
-                bg={mensagem.includes("❌") ? "red.100" : "green.100"}
-                color={mensagem.includes("❌") ? "red.600" : "green.600"}
-                p={2}
-                borderRadius="md"
-                textAlign="center"
-                mb="1rem"
-              >
-                {mensagem}
-              </Box>
+            {erroCampos && (
+              <Text color="red" fontSize="sm" ml="2.7rem" mb="1rem">
+                {erroCampos}
+              </Text>
+            )}
+
+            {notificacao && (
+              <Notificacao
+                msg={notificacao?.msg}
+                tipo={notificacao?.tipo}
+                descricao={notificacao?.descricao}
+                onClose={() => setNotificacao(null)}
+              />
             )}
 
             <Button
               w={{ base: "200px", md: "250px", lg: "350px" }}
               mb="1rem"
               bg="#6AB04C"
+              alignSelf='center'
               color="#fff"
               _hover={{ bg: "#579b3e" }}
-              borderRadius="15px"
               onClick={handleSubmit}
             >
               Criar
