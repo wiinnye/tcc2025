@@ -5,11 +5,10 @@ import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Box, Textarea, Button, VStack } from "@chakra-ui/react";
 import { getAuth } from "firebase/auth";
 import { Notificacao } from "../Notificacao/Notificacao";
-import { NotificacaoFeedBackAluno } from "../NotificacaoFeedBackAluno/NotificacaoFeedBackAluno";
 
 export default function FeedbackAluno() {
   const [mensagem, setMensagem] = useState("");
-   const [usuario, setUsuario] = useState(null);
+  //  const [usuario, setUsuario] = useState(null);
   const [notificacao, setNotificacao] = useState(null);
   const auth = getAuth();
   const user = auth.currentUser;
@@ -25,13 +24,10 @@ const enviarFeedback = async () => {
   }
 
   try {
-    // busca o nome no Firestore
     const userRef = doc(db, "usuarios", user.uid);
     const userSnap = await getDoc(userRef);
     const nomeUsuario = userSnap.exists() ? userSnap.data().nome : "Aluno";
-      if (userSnap.exists()) {
-            setUsuario(userSnap.data());
-          }
+
 
     await addDoc(collection(db, "feedbackAlunos"), {
         userId: user.uid,
@@ -41,6 +37,7 @@ const enviarFeedback = async () => {
         criadoEm: serverTimestamp(),
         visto: false,
         respondido: false,
+        notificacaoVistaPeloAluno: false
     });
 
     setMensagem("");
@@ -79,9 +76,7 @@ const enviarFeedback = async () => {
         />
       )}
 
-      {usuario && (
-      <NotificacaoFeedBackAluno user={user} />
-   )} 
+    
     </Box>
   );
 }

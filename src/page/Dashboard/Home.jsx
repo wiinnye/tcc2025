@@ -3,8 +3,16 @@ import MenuUsuario  from "../../components/Menu/Menu";
 import bannerPrincipal from "../../image/banner.png";
 import Footer from "../../components/Footer/Footer";
 import { CardCategoria } from "../../components/CardCategoria/CardCategoria";
+import { NotificacaoFeedBackAluno } from "../../components/NotificacaoFeedBackAluno/NotificacaoFeedBackAluno";
+import { getAuth } from "firebase/auth";
+
 
 export function Home() {
+
+  const auth = getAuth();
+  const user = auth.currentUser;
+
+  
   return (
     <Grid
       w="100%"
@@ -31,6 +39,8 @@ export function Home() {
       <GridItem  w="100%" h={{base:"100%", lg:"auto"}}>
         <Footer />
       </GridItem>
-    </Grid>
+        {/* NOTIFICACAO FEEDBACK ALUNO  */}
+        <NotificacaoFeedBackAluno user={user} />
+    </Grid> 
   );
 }

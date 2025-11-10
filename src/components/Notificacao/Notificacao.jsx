@@ -5,11 +5,10 @@ export function Notificacao({ msg, tipo, descricao, onClose }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (onClose) onClose();
-    }, 6000);
+    }, 2000);
     return () => clearTimeout(timer);
   }, [onClose]);
 
-  // Define a cor com base no tipo
   const corFundo =
     tipo === "erro" ? "red.500" : tipo === "aviso" ? "yellow.500" : "green.500";
 

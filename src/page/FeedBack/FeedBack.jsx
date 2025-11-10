@@ -66,7 +66,7 @@ export function FeedBack() {
           >
             {usuario?.tipo === "aluno"
               ? "Faça um FeedBack"
-              : "Confira o FeedBacks"}
+              : "Confira os FeedBacks"}
           </Text>
         </Flex>
       </GridItem>
