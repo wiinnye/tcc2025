@@ -14,8 +14,9 @@ export function Categorias() {
   const [categorias, setCategorias] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const navigate = useNavigate();
+  const [busca, setBusca] = useState("");
 
-  useEffect(() => {
+useEffect(() => {
     const buscarCategorias = async () => {
       try {
         const docRef = doc(db, "videos", "libra");
@@ -55,8 +56,13 @@ export function Categorias() {
       <GridItem w="100%" h="100%">
         <MenuUsuario />
       </GridItem>
-      <GridItem w="100%">
-        <Flex w="100%" direction="column" justify="center" p="2rem">
+      <GridItem w="100%" mt={{ lg: '4rem' }} p='5'>
+        <Flex
+          w="100%"
+          justify='space-between'
+          align={{ base: "start", lg: 'center' }}
+          gap={{ base: "3" }}
+        >
           <ToolTipContainer descricao="voltar pagina">
             <Button
               w={{ base: "15%", lg: "10%" }}
@@ -69,34 +75,40 @@ export function Categorias() {
               <RiArrowLeftLine />
             </Button>
           </ToolTipContainer>
-          <Text
-              fontSize={{ base: "xl", md: "2xl" }}
-              fontWeight="bold"
-              textAlign="center"
-            >
-              Confira as Linguagens Disponíveis:
-            </Text>
+          {/* <Filtro
+            busca={busca}
+            setBusca={setBusca}
+            placeholder={"buscar categoria pelo nome..."}
+          /> */}
         </Flex>
+        <GridItem>
+           <Text
+            fontSize={{ base: "xl", md: "2xl" }}
+            fontWeight="bold"
+            textAlign="center"
+          >
+            Confira as Linguagens Disponíveis:
+          </Text>
+        </GridItem>
       </GridItem>
-      <GridItem w="100%" h="100%">
+      <GridItem w="100%" h="100%" >
         {carregando ? (
           <SpinnerPage />
         ) : (
           <>
             <Flex
-              wrap="wrap"
+              w="100%"
+              minH="100%"
               justify="center"
               align="center"
               gap={3}
-              w="100%"
-              h="auto"
             >
               {categorias.map((categoria, index) => (
                 <Flex
                   key={index}
                   cursor="pointer"
                   w={{ base: "120px", md: "200px", lg: "300px" }}
-                  h={{ base: "120px", md: "50%", lg: "100%" }}
+                  h={{ base: "120px", md: "200px", lg: "350px" }}
                   direction="column"
                   align="center"
                   justify="center"
@@ -106,15 +118,18 @@ export function Categorias() {
                   backgroundSize="contain"
                   backgroundRepeat="no-repeat"
                   backgroundPosition="center"
-                  onClick={() => navigate(`/traducao/categoria/${categoria}`)}
+                 onClick={() => navigate(`/traducao/categoria/${categoria}`)}
                 >
                   <Text
                     mb={{ base: "3rem", md: "124px", lg: "110px" }}
                     fontWeight="bold"
                     color="#fff"
                     fontSize={{ base: "md", md: "24px", lg: "26px" }}
-                    textAlign="start"
+                    textAlign="center"
                     className="notranslate"
+                    w="100%"
+                    whiteSpace="normal"
+                    wordBreak="break-word"
                   >
                     {categoria.toUpperCase()}
                   </Text>

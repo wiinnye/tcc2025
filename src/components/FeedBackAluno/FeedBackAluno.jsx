@@ -8,7 +8,6 @@ import { Notificacao } from "../Notificacao/Notificacao";
 
 export default function FeedbackAluno() {
   const [mensagem, setMensagem] = useState("");
-  //  const [usuario, setUsuario] = useState(null);
   const [notificacao, setNotificacao] = useState(null);
   const auth = getAuth();
   const user = auth.currentUser;

@@ -2,15 +2,16 @@ import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Flex, Text, Image, Button, Grid, GridItem, Box, Input } from "@chakra-ui/react";
 import { db } from "../../services/firebase";
-import { doc, getDoc,updateDoc } from "firebase/firestore";
-import MenuUsuario  from "../../components/Menu/Menu";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
+import MenuUsuario from "../../components/Menu/Menu";
 import { RiCloseFill, RiArrowLeftLine } from "react-icons/ri";
 import { SpinnerPage } from "../../components/Spinner/Spinner";
 import Footer from "../../components/Footer/Footer"
 import { getAuth } from "firebase/auth";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { Notificacao } from "../../components/Notificacao/Notificacao";
-import  ToolTipContainer  from "../../components/ToolTip/ToolTip";
+import ToolTipContainer from "../../components/ToolTip/ToolTip";
+import Filtro from "../../components/Filtro/Filtro";
 
 export function VideoMostrar() {
   const { categoria } = useParams();
@@ -26,21 +27,21 @@ export function VideoMostrar() {
   );
 
 
-useEffect(() => {
-  const buscarUsuario = async () => {
-    const auth = getAuth();
-    const user = auth.currentUser;
-    if (user) {
-      const docRef = doc(db, "usuarios", user.uid);
-      const docSnap = await getDoc(docRef);
-      if (docSnap.exists()) {
-        setUsuario(docSnap.data());
+  useEffect(() => {
+    const buscarUsuario = async () => {
+      const auth = getAuth();
+      const user = auth.currentUser;
+      if (user) {
+        const docRef = doc(db, "usuarios", user.uid);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          setUsuario(docSnap.data());
+        }
       }
-    }
-  };
+    };
 
-  buscarUsuario();
-}, []);
+    buscarUsuario();
+  }, []);
 
   useEffect(() => {
     const buscarVideos = async () => {
@@ -73,64 +74,60 @@ useEffect(() => {
   }, [categoria]);
 
   const excluirVideo = async (video) => {
-  try {
-    const docRef = doc(db, "videos", "libra");
-    const docSnap = await getDoc(docRef);
+    try {
+      const docRef = doc(db, "videos", "libra");
+      const docSnap = await getDoc(docRef);
 
-    if (docSnap.exists()) {
-      const data = docSnap.data();
-      const novaLista = (data.lista || []).filter(v => v.url !== video.url); 
-      
-      await updateDoc(docRef, { lista: novaLista });
-      setVideos(novaLista); 
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        const novaLista = (data.lista || []).filter(v => v.url !== video.url);
 
-    setNotificacao(true) 
-    navigate('/categorias')
+        await updateDoc(docRef, { lista: novaLista });
+        setVideos(novaLista);
+
+        setNotificacao(true)
+        navigate('/categorias')
+      }
+    } catch (erro) {
+      notificacao("Erro ao excluir vídeo:", erro);
     }
-  } catch (erro) {
-    notificacao("Erro ao excluir vídeo:", erro);
-  }
-};
+  };
 
   return (
     <Grid w="100%" h="100vh" templateColumns="repeat(1, 2fr)" >
       <GridItem w="100%" h="100%">
         <MenuUsuario />
-      </GridItem> 
-      <GridItem w="100%" h="100%" mt={{lg:'4rem'}} p='5'>
-        <Flex 
+      </GridItem>
+      <GridItem w="100%" h="100%" mt={{ lg: '4rem' }} p='5'>
+        <Flex
           w="100%"
           justify='space-between'
-          align={{base:"start",lg:'center'}}
-          gap={{base:"3"}}>
+          align={{ base: "start", lg: 'center' }}
+          gap={{ base: "3" }}>
           <ToolTipContainer descricao='voltar pagina'>
             <Button
-            w={{ base: "15%", lg: "10%" }}
-            bg="#4cb04c"
-            onClick={() => {
-              navigate("/categorias");
-            }}
-          >
-            <RiArrowLeftLine />
-          </Button>
+              w={{ base: "15%", lg: "10%" }}
+              bg="#4cb04c"
+              onClick={() => {
+                navigate("/categorias");
+              }}
+            >
+              <RiArrowLeftLine />
+            </Button>
           </ToolTipContainer>
-          <Input
-          placeholder="Buscar vídeo pelo nome..."
-          value={busca}
-          onChange={(e) => setBusca(e.target.value)}
-          w={{ base: "50%", md: "30%" }}
-          display="block"
-        />
+          <Filtro
+            busca={busca}
+            setBusca={setBusca}
+            placeholder={"buscar vídeo pelo nome..."}
+          />
         </Flex>
-    
+
       </GridItem>
 
       <GridItem w="100%" h="100%">
-        {/* <Flex w="100%" justify="center" mb={6}> */}
-          <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" textAlign='center'>
-            Vídeos da categoria: {categoria.toUpperCase()}
-          </Text>
-        {/* </Flex> */}
+        <Text fontSize={{ base: "xl", md: "2xl" }} fontWeight="bold" textAlign='center'>
+          Vídeos da categoria: {categoria.toUpperCase()}
+        </Text>
       </GridItem>
       <GridItem w="100%" h="100%">
         {carregando ? (
@@ -151,7 +148,6 @@ useEffect(() => {
                 w="100%"
                 maxW="250px"
                 p='2rem'
-                // align='center'
               >
                 <Image
                   src={video.thumbnail}
@@ -160,33 +156,33 @@ useEffect(() => {
                   w="100%"
                   h="150px"
                 />
-                <Flex  justify='space-between' p={4}>
+                <Flex justify='space-between' p={4}>
                   <Text fontWeight="bold" fontSize="md" textAlign='center' noOfLines={1}>
                     {video.titulo.toUpperCase()}
                   </Text>
                   {usuario?.tipo === "adm" && (
                     <Box>
-                    <RiDeleteBin6Line
-                      size={24}
-                      color="#ff0000"
-                      style={{  cursor: "pointer" }}
-                      onClick={() => excluirVideo(video)}
-                    />
+                      <RiDeleteBin6Line
+                        size={24}
+                        color="#ff0000"
+                        style={{ cursor: "pointer" }}
+                        onClick={() => excluirVideo(video)}
+                      />
                     </Box>
                   )}
                 </Flex>
                 <Button
-                    w='70%'
-                    bg="#6AB04C"
-                    size="sm"
-                    color="white"
-                    m='1rem'
-                    alignSelf='center'
-                    _hover={{ bg: "#5CA13E" }}
-                    onClick={() => setVideoSelecionado(video)}
-                  >
-                    Assistir vídeo
-                  </Button>
+                  w='70%'
+                  bg="#6AB04C"
+                  size="sm"
+                  color="white"
+                  m='1rem'
+                  alignSelf='center'
+                  _hover={{ bg: "#5CA13E" }}
+                  onClick={() => setVideoSelecionado(video)}
+                >
+                  Assistir vídeo
+                </Button>
               </Flex>
             ))}
           </Flex>
@@ -221,12 +217,12 @@ useEffect(() => {
                   {videoSelecionado.titulo.toUpperCase()}
                 </Text>
                 <ToolTipContainer descricao='fechar'>
-                <RiCloseFill
-                  color="#6AB04C"
-                  cursor="pointer"
-                  size="30px"
-                  onClick={() => setVideoSelecionado(null)}
-                />
+                  <RiCloseFill
+                    color="#6AB04C"
+                    cursor="pointer"
+                    size="30px"
+                    onClick={() => setVideoSelecionado(null)}
+                  />
                 </ToolTipContainer>
               </Flex>
               <video
@@ -246,13 +242,13 @@ useEffect(() => {
         )}
 
         {notificacao && (
-        <Notificacao
-          mensagem="Vídeo Excluído com sucesso!"
-          onClose={() => setNotificacao(false)}
-        />
-      )}
+          <Notificacao
+            mensagem="Vídeo Excluído com sucesso!"
+            onClose={() => setNotificacao(false)}
+          />
+        )}
       </GridItem>
-        <Footer/>
+      <Footer />
     </Grid>
   );
 

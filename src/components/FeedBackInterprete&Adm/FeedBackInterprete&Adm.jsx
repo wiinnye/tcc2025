@@ -24,9 +24,7 @@ import Tooltip from "../../components/ToolTip/ToolTip";
 export default function FeedbackAdmin() {
   const [feedbacks, setFeedbacks] = useState([]);
 
-  // Função de formatação do Timestamp
   const formatarTimestamp = (timestamp) => {
-    // Garante que o objeto é válido e tem o método toDate()
     if (!timestamp || typeof timestamp.toDate !== "function") {
       return "Data indisponível";
     }
