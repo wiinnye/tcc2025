@@ -14,10 +14,10 @@ import Filtro from "../../components/Filtro/Filtro";
 export function Categorias() {
   const [categorias, setCategorias] = useState([]);
   const [carregando, setCarregando] = useState(true);
-  const [busca, setBusca] = useState("");
   const navigate = useNavigate();
+  const [busca, setBusca] = useState("");
 
-  useEffect(() => {
+useEffect(() => {
     const buscarCategorias = async () => {
       try {
         const docRef = doc(db, "videos", "libra");
@@ -83,6 +83,15 @@ export function Categorias() {
             placeholder={"buscar categoria pelo nome..."}
           />
         </Flex>
+        <GridItem>
+           <Text
+            fontSize={{ base: "xl", md: "2xl" }}
+            fontWeight="bold"
+            textAlign="center"
+          >
+            Confira as Linguagens Disponíveis:
+          </Text>
+        </GridItem>
       </GridItem>
       <GridItem>
         <Text
@@ -103,12 +112,11 @@ export function Categorias() {
         ) : (
           <>
             <Flex
-              wrap="wrap"
+              w="100%"
+              minH="100%"
               justify="center"
               align="center"
               gap={3}
-              w="100%"
-              h="auto"
             >
               {categoriasFiltradas.map((categoria, index) => (
                 <Flex
@@ -125,7 +133,7 @@ export function Categorias() {
                   backgroundSize="contain"
                   backgroundRepeat="no-repeat"
                   backgroundPosition="center"
-                  onClick={() => navigate(`/traducao/categoria/${categoria}`)}
+                 onClick={() => navigate(`/traducao/categoria/${categoria}`)}
                 >
                   <Text
                     mb={{ base: "3rem", md: "124px", lg: "110px" }}

@@ -33,8 +33,8 @@ export function Administrador() {
   const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
   const [carregando, setCarregando] = useState(true);
   const [mensagem, setMensagem] = useState("");
-  const [videoAberto, setVideoAberto] = useState(null); // Controle de qual vídeo está aberto
-  const navigate = useNavigate();
+  const [videoAberto, setVideoAberto] = useState(null);
+  const navigate = useNavigate()
 
   useEffect(() => {
     const buscarPendentes = async () => {
@@ -129,19 +129,7 @@ export function Administrador() {
   };
   const videoSelecionado = pendentes.find((vid) => vid.id === videoAberto);
 
-    const capitalizeName = (name) => {
-    if (!name) return '';
-    
-    const lowerName = name.toLowerCase();
-    const capitalizedWords = lowerName.split(' ').map((word) => {
-      if (word.length === 0) return '';
-      return word.charAt(0).toUpperCase() + word.slice(1);
-    });
-
-    return capitalizedWords.join(' ');
-  };
-
-    const formatarTimestamp = (timestamp) => {
+  const formatarTimestamp = (timestamp) => {
     if (!timestamp || typeof timestamp.toDate !== "function") {
       return "Data indisponível";
     }
@@ -171,20 +159,19 @@ export function Administrador() {
           p={{ base: ".6rem", md: "1rem" }}
           mt={{ base: "3rem", md: "2rem" }}
         >
-          <ToolTipContainer descricao="voltar pagina">
+          <ToolTipContainer descricao='voltar pagina'>
             <Button
               w={{ base: "20%", md: "10%" }}
               bg="#4cb04c"
               mb={4}
               onClick={() => {
-                navigate("/tradutor");
+                navigate("/tradutor")
               }}
             >
               <RiArrowLeftLine />
             </Button>
           </ToolTipContainer>
-        </GridItem>
-      ) : (
+        </GridItem>) :
         <GridItem
           w="100%"
           h="100"
@@ -203,7 +190,7 @@ export function Administrador() {
             <RiArrowLeftLine />
           </Button>
         </GridItem>
-      )}
+      }
 
       <GridItem w="100%" h="100" p="1rem">
         <Text
@@ -214,26 +201,8 @@ export function Administrador() {
         >
           Revisão de Vídeos
         </Text>
-      {!categoriaSelecionada ?
-        <Text
-          fontSize={{ base: "xl", md: "2xl" }}
-          mb={6}
-          mr="40%"
-          textAlign="center"
-        >
-          Confira as Categorias:
-        </Text>
-        :
-        <Text
-          fontSize={{ base: "xl", md: "2xl" }}
-          mb={6}
-          mr="50%"
-          textAlign="center"
-        >
-        Videos da Categoria: {capitalizeName(categoriaSelecionada)}
-        </Text>
 
-      }
+    
         {carregando ? (
           <Spinner size="lg" color="#6AB04C" />
         ) : (
@@ -251,8 +220,8 @@ export function Administrador() {
                   <Flex
                     key={categ.nome}
                     cursor="pointer"
-                    w={{ base: "200px", md: "200px", lg: "300px" }}
-                    h={{ base: "150px", md: "200px", lg: "350px" }}
+                    w={{ base: "120px", md: "200px", lg: "300px" }}
+                    h={{ base: "120px", md: "200px", lg: "350px" }}
                     direction="column"
                     align="center"
                     justify="center"
@@ -265,18 +234,19 @@ export function Administrador() {
                     onClick={() => setCategoriaSelecionada(categ.nome)}
                     position="relative"
                   >
+
                     {categ.quantidade > 0 && (
-                      <ToolTipContainer descricao="Quantidade videos pendentes">
+                      <ToolTipContainer descricao='quantidade video pendente'>
                         <Badge
-                          bg="#b82323"
+                          bg="#ae1212ff"
+                          color='#fff'
                           borderRadius="full"
-                          color="#fff"
                           px={3}
                           py={1}
                           fontSize="lg"
                           position="absolute"
                           top={{ base: 2, md: 4 }}
-                          right={{ base: 2, md: 1 }}
+                          right={{ base: 2, md: 4 }}
                           zIndex={10}
                         >
                           {categ.quantidade}
@@ -293,7 +263,7 @@ export function Administrador() {
                       className="notranslate"
                       w="100%"
                       whiteSpace="normal"
-                      wordBreak={{ lg: "break-word" }}
+                      wordBreak="break-word"
                     >
                       {categ.nome.toUpperCase()}
                     </Text>
@@ -322,7 +292,7 @@ export function Administrador() {
                           alt="Thumb do vídeo"
                           objectFit="cover"
                           w="100%"
-                          h="150px"
+                          h="180px"
                         />
 
                         <Flex minW="50%" mt="1rem" p=".4rem" direction="column">
@@ -334,7 +304,7 @@ export function Administrador() {
                             {v.titulo.toUpperCase()}
                           </Text>
                           <Text fontSize="sm" color="gray.500">
-                            Data: {formatarTimestamp(v.createdAt)}
+                             Enviado em:: {formatarTimestamp(v.createdAt)}
                           </Text>
                           <Text fontSize="sm" color="gray.500">
                             Enviado por: {v.interpreteEmail || "Não informado"}

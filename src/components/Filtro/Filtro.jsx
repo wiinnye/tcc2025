@@ -3,7 +3,6 @@ import { Input } from "@chakra-ui/react";
 
 export default function Filtro({ busca, setBusca, placeholder }) {
 
-
   return (
     <Input
       placeholder={placeholder}

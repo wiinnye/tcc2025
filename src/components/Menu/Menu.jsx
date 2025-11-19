@@ -9,7 +9,6 @@ import {
   useBreakpointValue,
   Icon,
 } from "@chakra-ui/react";
-// import { FaUserCircle } from "react-icons/fa";
 import { RiMenuFill } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { getAuth, signOut } from "firebase/auth";
@@ -72,6 +71,7 @@ export default function MenuUsuario() {
     navigate("/"); 
   };
 
+
   return (
     <Flex w="100%" h="100%" bg="#4cb04c" direction="column" boxShadow="sm">
       {carregando && <SpinnerPage />}
@@ -79,16 +79,7 @@ export default function MenuUsuario() {
       {!carregando && usuario && (
         <Flex w="100%" h="100%" justify="space-between" p={3} align="center">
           <Flex align="center" gap={3}>
-            {/* <Flex
-              align="center"
-              justify="center"
-              borderRadius="full"
-              w={{ sm: "32px", md: "50px", lg: "60px" }}
-              h={{ sm: "32px", md: "50px", lg: "60px" }}
-            >
-              <FaUserCircle size="40" color="white" />
-            </Flex> */}
-            <Box textAlign="left" color="white" ml='3rem'>
+            <Box textAlign="left" color="white" ml='1.5rem'>
               <Text
                 fontSize={{ sm: "18px", md: "24px", lg: "24px" }}
                 fontWeight="bold"
@@ -96,7 +87,7 @@ export default function MenuUsuario() {
                 {capitalizeName(usuario?.nome) || "Usuário"}
               </Text>
               <Text fontSize="md" color="#cecece">
-                {capitalizeName(usuario?.tipo) || ""}
+                {capitalizeName(usuario?.tipo) || "Usuário"}
               </Text>
             </Box>
           </Flex>
