@@ -9,7 +9,7 @@ import {
   useBreakpointValue,
   Icon,
 } from "@chakra-ui/react";
-import { FaUserCircle } from "react-icons/fa";
+// import { FaUserCircle } from "react-icons/fa";
 import { RiMenuFill } from "react-icons/ri";
 import { useEffect, useState } from "react";
 import { getAuth, signOut } from "firebase/auth";
@@ -20,7 +20,7 @@ import { SpinnerPage } from "../Spinner/Spinner";
 import { MenuLink } from "../MenuLink/MenuLink";
 import { menusPorTipo } from "../../services/menu";
 import { IoLogInOutline } from "react-icons/io5";
-import  ToolTipContainer  from "../ToolTip/ToolTip";
+import ToolTipContainer from "../ToolTip/ToolTip";
 
 export default function MenuUsuario() {
   const [usuario, setUsuario] = useState(null);
@@ -29,6 +29,19 @@ export default function MenuUsuario() {
   const navigate = useNavigate();
   const isMobile = useBreakpointValue({ base: true, md: false });
   const menus = menusPorTipo[usuario?.tipo] || [];
+
+  const capitalizeName = (name) => {
+    if (!name) return '';
+    
+    const lowerName = name.toLowerCase();
+    const capitalizedWords = lowerName.split(' ').map((word) => {
+      if (word.length === 0) return '';
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    });
+
+    return capitalizedWords.join(' ');
+  };
+
 
   useEffect(() => {
     const buscarUsuario = async () => {
@@ -56,7 +69,7 @@ export default function MenuUsuario() {
   const handleLogout = async () => {
     const auth = getAuth();
     await signOut(auth);
-    navigate("/"); // redireciona para a página inicial ou login
+    navigate("/"); 
   };
 
   return (
@@ -66,7 +79,7 @@ export default function MenuUsuario() {
       {!carregando && usuario && (
         <Flex w="100%" h="100%" justify="space-between" p={3} align="center">
           <Flex align="center" gap={3}>
-            <Flex
+            {/* <Flex
               align="center"
               justify="center"
               borderRadius="full"
@@ -74,30 +87,30 @@ export default function MenuUsuario() {
               h={{ sm: "32px", md: "50px", lg: "60px" }}
             >
               <FaUserCircle size="40" color="white" />
-            </Flex>
-            <Box textAlign="left" color="white">
+            </Flex> */}
+            <Box textAlign="left" color="white" ml='3rem'>
               <Text
                 fontSize={{ sm: "18px", md: "24px", lg: "24px" }}
                 fontWeight="bold"
               >
-                {usuario?.nome || "Usuário"}
+                {capitalizeName(usuario?.nome) || "Usuário"}
               </Text>
               <Text fontSize="md" color="#cecece">
-                {usuario?.tipo || ""}
+                {capitalizeName(usuario?.tipo) || ""}
               </Text>
             </Box>
           </Flex>
           <ToolTipContainer descricao='sair da conta'>
             <Button
-                  cursor="pointer"
-                  color="#fff"
-                  pr="1.5rem"
-                  bg="#4cb04c"
-                  onClick={handleLogout}
-                >
-                  <Icon as={IoLogInOutline} w={10} h={10} />
+              cursor="pointer"
+              color="#fff"
+              pr="1.5rem"
+              bg="#4cb04c"
+              onClick={handleLogout}
+            >
+              <Icon as={IoLogInOutline} w={10} h={10} />
             </Button>
-        </ToolTipContainer>
+          </ToolTipContainer>
         </Flex>
       )}
 

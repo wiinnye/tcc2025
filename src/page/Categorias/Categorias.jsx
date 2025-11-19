@@ -9,10 +9,12 @@ import { SpinnerPage } from "../../components/Spinner/Spinner";
 import Footer from "../../components/Footer/Footer";
 import { RiArrowLeftLine } from "react-icons/ri";
 import ToolTipContainer from "../../components/ToolTip/ToolTip";
+import Filtro from "../../components/Filtro/Filtro";
 
 export function Categorias() {
   const [categorias, setCategorias] = useState([]);
   const [carregando, setCarregando] = useState(true);
+  const [busca, setBusca] = useState("");
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -23,9 +25,7 @@ export function Categorias() {
 
         if (docSnap.exists()) {
           const data = docSnap.data();
-
           const listaVideos = data.lista || [];
-
           const todasCategorias = listaVideos.map((video) => video.categoria);
 
           const categoriasMap = new Map();
@@ -37,7 +37,6 @@ export function Categorias() {
           });
 
           const categoriasUnicas = Array.from(categoriasMap.values());
-
           setCategorias(categoriasUnicas);
         }
       } catch (error) {
@@ -50,13 +49,22 @@ export function Categorias() {
     buscarCategorias();
   }, []);
 
+  const categoriasFiltradas = categorias.filter((categoria) =>
+    categoria.toLowerCase().includes(busca.toLowerCase())
+  );
+
   return (
     <Grid w="100%" minH="100vh" templateColumns="repeat(1, 2fr)">
       <GridItem w="100%" h="100%">
         <MenuUsuario />
       </GridItem>
-      <GridItem w="100%">
-        <Flex w="100%" direction="column" justify="center" p="2rem">
+      <GridItem w="100%" h="100%" mt={{ lg: "4rem" }} p="5">
+        <Flex
+          w="100%"
+          justify="space-between"
+          align={{ base: "start", lg: "center" }}
+          gap={{ base: "3" }}
+        >
           <ToolTipContainer descricao="voltar pagina">
             <Button
               w={{ base: "15%", lg: "10%" }}
@@ -69,18 +77,29 @@ export function Categorias() {
               <RiArrowLeftLine />
             </Button>
           </ToolTipContainer>
-          <Text
-              fontSize={{ base: "xl", md: "2xl" }}
-              fontWeight="bold"
-              textAlign="center"
-            >
-              Confira as Linguagens Disponíveis:
-            </Text>
+          <Filtro
+            busca={busca}
+            setBusca={setBusca}
+            placeholder={"buscar categoria pelo nome..."}
+          />
         </Flex>
+      </GridItem>
+      <GridItem>
+        <Text
+          fontSize={{ base: "xl", md: "2xl" }}
+          fontWeight="bold"
+          textAlign="center"
+        >
+          Confira as Linguagens Disponíveis:
+        </Text>
       </GridItem>
       <GridItem w="100%" h="100%">
         {carregando ? (
           <SpinnerPage />
+        ) : categoriasFiltradas.length === 0 ? (
+          <Text textAlign="center" mt="4">
+            Nenhuma Categoria Encontrada.
+          </Text>
         ) : (
           <>
             <Flex
@@ -91,12 +110,12 @@ export function Categorias() {
               w="100%"
               h="auto"
             >
-              {categorias.map((categoria, index) => (
+              {categoriasFiltradas.map((categoria, index) => (
                 <Flex
                   key={index}
                   cursor="pointer"
-                  w={{ base: "120px", md: "200px", lg: "300px" }}
-                  h={{ base: "120px", md: "50%", lg: "100%" }}
+                w={{ base: "200px", md: "200px", lg: "300px" }}
+                    h={{ base: "150px", md: "200px", lg: "350px" }}
                   direction="column"
                   align="center"
                   justify="center"
@@ -113,8 +132,11 @@ export function Categorias() {
                     fontWeight="bold"
                     color="#fff"
                     fontSize={{ base: "md", md: "24px", lg: "26px" }}
-                    textAlign="start"
+                    textAlign="center"
                     className="notranslate"
+                    w="100%"
+                    whiteSpace="normal"
+                    wordBreak="break-word"
                   >
                     {categoria.toUpperCase()}
                   </Text>

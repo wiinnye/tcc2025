@@ -5,9 +5,9 @@ import {
   Spinner,
   Image,
   Button,
-  Box,
   GridItem,
   Grid,
+  Badge,
 } from "@chakra-ui/react";
 import { db } from "../../services/firebase";
 import {
@@ -18,12 +18,14 @@ import {
   updateDoc,
   arrayUnion,
 } from "firebase/firestore";
-import MenuUsuario  from "../../components/Menu/Menu";
+import bgCategoria from "../../image/bgCategoria.png";
+import MenuUsuario from "../../components/Menu/Menu";
 import { Notificacao } from "../../components/Notificacao/Notificacao";
-import ToolTipContainer from '../../components/ToolTip/ToolTip'
+import ToolTipContainer from "../../components/ToolTip/ToolTip";
 import { FaRegTrashAlt } from "react-icons/fa";
 import { RiCloseFill, RiArrowLeftLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
+import Footer from "../../components/Footer/Footer";
 
 export function Administrador() {
   const [pendentes, setPendentes] = useState([]);
@@ -32,7 +34,7 @@ export function Administrador() {
   const [carregando, setCarregando] = useState(true);
   const [mensagem, setMensagem] = useState("");
   const [videoAberto, setVideoAberto] = useState(null); // Controle de qual vídeo está aberto
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     const buscarPendentes = async () => {
@@ -125,52 +127,83 @@ export function Administrador() {
       console.error("Erro:", error);
     }
   };
-const videoSelecionado = pendentes.find((vid) => vid.id === videoAberto);
-  
-return (
+  const videoSelecionado = pendentes.find((vid) => vid.id === videoAberto);
+
+    const capitalizeName = (name) => {
+    if (!name) return '';
+    
+    const lowerName = name.toLowerCase();
+    const capitalizedWords = lowerName.split(' ').map((word) => {
+      if (word.length === 0) return '';
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    });
+
+    return capitalizedWords.join(' ');
+  };
+
+    const formatarTimestamp = (timestamp) => {
+    if (!timestamp || typeof timestamp.toDate !== "function") {
+      return "Data indisponível";
+    }
+
+    const dataJs = timestamp.toDate();
+
+    const dataFormatada = dataJs.toLocaleDateString("pt-BR");
+    const horaFormatada = dataJs.toLocaleTimeString("pt-BR", {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+    });
+
+    return `${dataFormatada} às ${horaFormatada}`;
+  };
+
+  return (
     <Grid w="100%" h="100%" templateColumns="repeat(1, 5fr)" gap={3}>
       <GridItem w="100%" h="100">
         <MenuUsuario />
       </GridItem>
 
-      {!categoriaSelecionada ? (<GridItem
-        w="100%"
-        h="100"
-        p={{ base: ".6rem", md: "1rem" }}
-        mt={{ base: "3rem", md: "2rem" }}
-      >
-        <ToolTipContainer descricao='voltar pagina'>
+      {!categoriaSelecionada ? (
+        <GridItem
+          w="100%"
+          h="100"
+          p={{ base: ".6rem", md: "1rem" }}
+          mt={{ base: "3rem", md: "2rem" }}
+        >
+          <ToolTipContainer descricao="voltar pagina">
+            <Button
+              w={{ base: "20%", md: "10%" }}
+              bg="#4cb04c"
+              mb={4}
+              onClick={() => {
+                navigate("/tradutor");
+              }}
+            >
+              <RiArrowLeftLine />
+            </Button>
+          </ToolTipContainer>
+        </GridItem>
+      ) : (
+        <GridItem
+          w="100%"
+          h="100"
+          p={{ base: ".6rem", md: "1rem" }}
+          mt={{ base: "3rem", md: "2rem" }}
+        >
           <Button
             w={{ base: "20%", md: "10%" }}
             bg="#4cb04c"
             mb={4}
             onClick={() => {
-              navigate("/tradutor")
+              setCategoriaSelecionada(null);
+              setVideoAberto(null);
             }}
           >
             <RiArrowLeftLine />
           </Button>
-          </ToolTipContainer>
-      </GridItem>):
-  <GridItem
-        w="100%"
-        h="100"
-        p={{ base: ".6rem", md: "1rem" }}
-        mt={{ base: "3rem", md: "2rem" }}
-      >
-        <Button
-          w={{ base: "20%", md: "10%" }}
-          bg="#4cb04c"
-          mb={4}
-          onClick={() => {
-            setCategoriaSelecionada(null);
-            setVideoAberto(null);
-          }}
-        >
-          <RiArrowLeftLine />
-        </Button>
-      </GridItem>
-      }
+        </GridItem>
+      )}
 
       <GridItem w="100%" h="100" p="1rem">
         <Text
@@ -179,47 +212,92 @@ return (
           mb={6}
           textAlign="center"
         >
-          Moderação de Vídeos Pendentes
+          Revisão de Vídeos
+        </Text>
+      {!categoriaSelecionada ?
+        <Text
+          fontSize={{ base: "xl", md: "2xl" }}
+          mb={6}
+          mr="40%"
+          textAlign="center"
+        >
+          Confira as Categorias:
+        </Text>
+        :
+        <Text
+          fontSize={{ base: "xl", md: "2xl" }}
+          mb={6}
+          mr="50%"
+          textAlign="center"
+        >
+        Videos da Categoria: {capitalizeName(categoriaSelecionada)}
         </Text>
 
+      }
         {carregando ? (
           <Spinner size="lg" color="#6AB04C" />
         ) : (
           <>
             {!categoriaSelecionada ? (
               <Flex
-                w="100%"
-                minH="100%"
+                wrap="wrap"
                 justify="center"
                 align="center"
                 gap={3}
+                w="100%"
+                h="auto"
               >
-                {categorias.map((cat) => (
-                  <Box
-                    key={cat.nome}
-                    maxH="50%"
-                    bg="#fff"
-                    border="2px solid #6AB04C"
-                    borderRadius="md"
-                    p="1rem"
+                {categorias.map((categ) => (
+                  <Flex
+                    key={categ.nome}
                     cursor="pointer"
-                    boxShadow="md"
-                    onClick={() => setCategoriaSelecionada(cat.nome)}
+                    w={{ base: "200px", md: "200px", lg: "300px" }}
+                    h={{ base: "150px", md: "200px", lg: "350px" }}
+                    direction="column"
+                    align="center"
+                    justify="center"
+                    p="3rem"
                     _hover={{ transform: "scale(1.05)", transition: "0.3s" }}
+                    backgroundImage={`url(${bgCategoria})`}
+                    backgroundSize="contain"
+                    backgroundRepeat="no-repeat"
+                    backgroundPosition="center"
+                    onClick={() => setCategoriaSelecionada(categ.nome)}
+                    position="relative"
                   >
+                    {categ.quantidade > 0 && (
+                      <ToolTipContainer descricao="Quantidade videos pendentes">
+                        <Badge
+                          bg="#b82323"
+                          borderRadius="full"
+                          color="#fff"
+                          px={3}
+                          py={1}
+                          fontSize="lg"
+                          position="absolute"
+                          top={{ base: 2, md: 4 }}
+                          right={{ base: 2, md: 1 }}
+                          zIndex={10}
+                        >
+                          {categ.quantidade}
+                        </Badge>
+                      </ToolTipContainer>
+                    )}
+
                     <Text
-                      fontSize="lg"
+                      mb={{ base: "3rem", md: "124px", lg: "110px" }}
                       fontWeight="bold"
-                      mb={2}
-                      color="#6AB04C"
+                      color="#fff"
+                      fontSize={{ base: "md", md: "24px", lg: "26px" }}
+                      textAlign="center"
                       className="notranslate"
+                      w="100%"
+                      whiteSpace="normal"
+                      wordBreak={{ lg: "break-word" }}
                     >
-                      {cat.nome.toUpperCase()}
+                      {categ.nome.toUpperCase()}
                     </Text>
-                    <Text fontSize="md">
-                      {cat.quantidade} vídeo(s) pendente(s)
-                    </Text>
-                  </Box>
+                  </Flex>
                 ))}
               </Flex>
             ) : (
@@ -247,17 +325,21 @@ return (
                           h="150px"
                         />
 
-                        <Flex minW="50%" mt="1rem" p=".4rem" direction="column" >
-                          <Text fontWeight="bold" fontSize="lg" className="notranslate" >
+                        <Flex minW="50%" mt="1rem" p=".4rem" direction="column">
+                          <Text
+                            fontWeight="bold"
+                            fontSize="lg"
+                            className="notranslate"
+                          >
                             {v.titulo.toUpperCase()}
                           </Text>
                           <Text fontSize="sm" color="gray.500">
-                            Intérprete: {v.interpete || "Não informado"}
+                            Data: {formatarTimestamp(v.createdAt)}
                           </Text>
                           <Text fontSize="sm" color="gray.500">
                             Enviado por: {v.interpreteEmail || "Não informado"}
                           </Text>
-                                    <Button
+                          <Button
                             mt={2}
                             size="sm"
                             bg="#6AB04C"
@@ -355,6 +437,10 @@ return (
             )}
           </>
         )}
+      </GridItem>
+
+      <GridItem>
+        <Footer />
       </GridItem>
 
       {mensagem && (

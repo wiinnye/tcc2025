@@ -1,4 +1,3 @@
-// MenuLink.jsx
 import { Text } from "@chakra-ui/react";
 
 export function MenuLink({ label, onClick }) {
