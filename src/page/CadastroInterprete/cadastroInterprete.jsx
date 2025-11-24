@@ -11,44 +11,46 @@ import ToolTipContainer from "../../components/ToolTip/ToolTip";
 import bgFuntlibra from "../../image/bgFuntlibra.png";
 import { useState } from "react";
 import { IoEyeOff, IoEyeSharp } from "react-icons/io5";
-import { auth, db } from "../../services/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import { db } from "../../services/firebase";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth"; 
 import InputMask from "react-input-mask";
 import { useNavigate } from "react-router-dom";
 import { doc, setDoc } from "firebase/firestore";
 import { RiArrowLeftLine } from "react-icons/ri";
-import {Notificacao} from "../../components/Notificacao/Notificacao";
+import { Notificacao } from "../../components/Notificacao/Notificacao";
+import { SpinnerPage } from "../../components/Spinner/Spinner";
 
 export function CadastroInterprete() {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const navigate = useNavigate();
+
   const [senha, setSenha] = useState("");
   const [nomeInterprete, setNomeInterprete] = useState("");
   const [emailInterprete, setEmailInterprete] = useState("");
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [showSenha, setShowSenha] = useState(false);
   const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
-  const [notificacao, setNotificacao] = useState("");
+  const [notificacao, setNotificacao] = useState(null); 
   const [cpfInterprete, setEmailCpfInterprete] = useState("");
   const [cdiInterprete, setCdiInterprete] = useState("");
   const [erroCpf, setErroCpf] = useState("");
   const [erroSenha, setErroSenha] = useState("");
   const [erroEmail, setErroEmail] = useState("");
-  const [erroCDI, setErroCDI] = useState("");
+  const [erroCDl, setErroCDl] = useState("");
   const [erroCampos, setErroCampos] = useState("");
+  const [carregando, setCarregando] = useState(false); 
+
+  const firebaseAuth = getAuth();
 
   function validarCPF(cpf) {
-    cpf = cpfInterprete.replace(/[^\d]+/g, ""); // Remove pontos e traços
+    cpf = cpfInterprete.replace(/[^\d]+/g, "");
 
     if (cpf.length !== 11) return false;
-
-    // Verifica se todos os dígitos são iguais (CPF inválido)
     if (/^(\d)\1+$/.test(cpf)) return false;
 
     let soma = 0;
     let resto;
 
-    // Validação do primeiro dígito
     for (let i = 1; i <= 9; i++) {
       soma += parseInt(cpf.substring(i - 1, i)) * (11 - i);
     }
@@ -56,7 +58,6 @@ export function CadastroInterprete() {
     if (resto === 10 || resto === 11) resto = 0;
     if (resto !== parseInt(cpf.substring(9, 10))) return false;
 
-    // Validação do segundo dígito
     soma = 0;
     for (let i = 1; i <= 10; i++) {
       soma += parseInt(cpf.substring(i - 1, i)) * (12 - i);
@@ -71,7 +72,20 @@ export function CadastroInterprete() {
   const handleSubmit = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-    if (!nomeInterprete || !emailInterprete || !senha || !confirmarSenha) {
+    setErroCpf("");
+    setErroSenha("");
+    setErroCDl("");
+    setErroCampos("");
+    setErroEmail("");
+
+    if (
+      !nomeInterprete ||
+      !emailInterprete ||
+      !senha ||
+      !confirmarSenha ||
+      !cpfInterprete ||
+      !cdiInterprete
+    ) {
       setErroCampos("Preencha todos os campos!");
       return;
     }
@@ -86,19 +100,13 @@ export function CadastroInterprete() {
       return;
     }
 
-    if (cdiInterprete.length < 10 ) {
-      setErroCDI("A CDI precisa ter no mínimo 10 caracteres.");
+    if (cdiInterprete.length < 10) {
+      setErroCDl("A CDL precisa ter no mínimo 10 caracteres.");
       return;
     }
-
 
     if (senha !== confirmarSenha) {
       setErroSenha("As senhas não são iguais.");
-      return;
-    }
-
-    if (!cpfInterprete) {
-      setErroCpf("Preencha o CPF!");
       return;
     }
 
@@ -107,25 +115,32 @@ export function CadastroInterprete() {
       return;
     }
 
-    setErroCpf("");
-    setErroSenha("");
-    setErroCDI("");
-    setErroCampos("")
-    setErroEmail("")
+    setCarregando(true);
+
+    const currentUser = firebaseAuth.currentUser;
+
+    if (!currentUser) {
+      setNotificacao({
+        msg: "Erro: Nenhuma sessão de administrador ativa.",
+        descricao: "Faça login novamente para realizar o cadastro.",
+        tipo: "erro",
+      });
+      setCarregando(false);
+      return;
+    }
+
+    let novoUsuarioUid = null;
 
     try {
-      // Cria usuário no Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(
-        auth,
+        firebaseAuth, 
         emailInterprete,
-        senha,
-        cdiInterprete,
-        cpfInterprete
+        senha
       );
-      const user = userCredential.user;
+      const newUser = userCredential.user;
+      novoUsuarioUid = newUser.uid;
 
-      // Salva no Firestore
-      await setDoc(doc(db, "usuarios", user.uid), {
+      await setDoc(doc(db, "usuarios", newUser.uid), {
         nome: nomeInterprete,
         email: emailInterprete,
         cdi: cdiInterprete,
@@ -134,20 +149,43 @@ export function CadastroInterprete() {
         tipo: "interprete",
       });
 
-      setNotificacao({ msg: "Conta criada com sucesso!", tipo: "sucesso" });
-    } catch (erro) {
-      if (erro.code === 'auth/email-already-in-use') {
+      await firebaseAuth.updateCurrentUser(currentUser);
+
       setNotificacao({
-        msg:'Este E-mail já está cadastrado!',
-        descricao:"Tente fazer login ou use outro E-mail",
-        tipo:"erro"})
-    }else {
-      setNotificacao({
-        msg: "Erro ao criar usuário. Verifique os dados!",
-        tipo: "erro",
+        msg: "Conta de Intérprete criada com sucesso!",
+        tipo: "sucesso",
       });
+
+      setSenha("");
+      setNomeInterprete("");
+      setEmailInterprete("");
+      setConfirmarSenha("");
+      setEmailCpfInterprete("");
+      setCdiInterprete("");
+      navigate("/login")
+    } catch (erro) {
+
+      if (firebaseAuth.currentUser?.uid === novoUsuarioUid && currentUser) {
+        await firebaseAuth.updateCurrentUser(currentUser);
+      }
+
+      if (erro.code === "auth/email-already-in-use") {
+        setNotificacao({
+          msg: "Este E-mail já está cadastrado!",
+          descricao: "Tente fazer login ou use outro E-mail",
+          tipo: "erro",
+        });
+      } else {
+        console.error("Erro no cadastro:", erro);
+        setNotificacao({
+          msg: "Erro ao criar usuário.",
+          descricao: `Código: ${erro.code}. Verifique os dados.`,
+          tipo: "erro",
+        });
+      }
+    } finally {
+      setCarregando(false);
     }
-  }
   };
 
   return (
@@ -191,7 +229,6 @@ export function CadastroInterprete() {
           <Flex
             w={{ base: "300px", s: "150px", md: "350px", lg: "500px" }}
             h="500px"
-            // alignItems={"center"}
             alignContent={"center"}
             justify={"center"}
             flexDirection="column"
@@ -217,7 +254,7 @@ export function CadastroInterprete() {
               w={{ base: "200px", md: "250px", lg: "350px" }}
               mb="1rem"
               placeholder="Nome Completo"
-              alignSelf='center'
+              alignSelf="center"
               padding=".5rem"
               borderColor={!erroCampos ? "#DEF5DE" : "red"}
               value={nomeInterprete}
@@ -228,7 +265,7 @@ export function CadastroInterprete() {
               mb="1rem"
               placeholder="Email"
               padding=".5rem"
-              alignSelf='center'
+              alignSelf="center"
               borderColor={!erroEmail && !erroCampos ? "#DEF5DE" : "red"}
               value={emailInterprete}
               onChange={(e) => setEmailInterprete(e.target.value)}
@@ -239,43 +276,44 @@ export function CadastroInterprete() {
               </Text>
             )}
             <Flex
-              alignSelf='center'
-              alignItems='center'
-              justify='space-around'
-              px='.5rem'
+              alignSelf="center"
+              alignItems="center"
+              justify="space-around"
+              px=".5rem"
+              w={{ base: "200px", md: "250px", lg: "350px" }}
             >
-            <Input
-              w={{ base: "200px", md: "250px", lg: "50%" }}
-              mb="1rem"
-              placeholder="CDI"
-              pr='.5rem'
-              borderColor={!erroCDI && !erroCampos ? "#DEF5DE" : "red"}
-              value={cdiInterprete}
-              onChange={(e) => setCdiInterprete(e.target.value)}
-            />
-            
-            <Input
-              w={{ base: "200px", md: "250px", lg: "50%" }}
-              mb="1rem"
-              as={InputMask}
-              mask="999.999.999-99"
-              placeholder="CPF"
-              ml=".5rem"
-              borderColor={!erroCpf && !erroCampos ? "#DEF5DE" : "red"}
-              error={erroCpf}
-              value={cpfInterprete}
-              onChange={(e) => setEmailCpfInterprete(e.target.value)}
-            />
+              <Input
+                w="50%"
+                mb="1rem"
+                placeholder="CDI"
+                pr=".5rem"
+                borderColor={!erroCDl && !erroCampos ? "#DEF5DE" : "red"}
+                value={cdiInterprete}
+                onChange={(e) => setCdiInterprete(e.target.value)}
+              />
+
+              <Input
+                w="50%"
+                mb="1rem"
+                as={InputMask}
+                mask="999.999.999-99"
+                placeholder="CPF"
+                ml=".5rem"
+                borderColor={!erroCpf && !erroCampos ? "#DEF5DE" : "red"}
+                error={erroCpf}
+                value={cpfInterprete}
+                onChange={(e) => setEmailCpfInterprete(e.target.value)}
+              />
             </Flex>
 
-               {erroCpf && (
+            {erroCpf && (
               <Text color="red" fontSize="sm" ml="52%" mb="1rem">
                 {erroCpf}
               </Text>
             )}
-             {erroCDI && (
+            {erroCDl && (
               <Text color="red" fontSize="sm" ml="4.7rem" mb="1rem">
-                {erroCDI}
+                {erroCDl}
               </Text>
             )}
 
@@ -284,7 +322,7 @@ export function CadastroInterprete() {
               position="relative"
               w={{ base: "200px", md: "250px", lg: "350px" }}
               mb="1rem"
-              alignSelf='center'
+              alignSelf="center"
             >
               <Input
                 type={showSenha ? "text" : "password"}
@@ -316,7 +354,7 @@ export function CadastroInterprete() {
               position="relative"
               w={{ base: "200px", md: "250px", lg: "350px" }}
               mb="1rem"
-              alignSelf='center'
+              alignSelf="center"
             >
               <Input
                 type={showConfirmarSenha ? "text" : "password"}
@@ -363,16 +401,31 @@ export function CadastroInterprete() {
               />
             )}
 
-            <Button
-              w={{ base: "200px", md: "250px", lg: "350px" }}
-              mb="1rem"
-              bg={"#6AB04C"}
-              color="#fff"
-              alignSelf='center'
-              onClick={handleSubmit}
-            >
-              Criar
-            </Button>
+            {carregando ? (
+              <Button
+                w={{ base: "200px", md: "250px", lg: "350px" }}
+                mb="1rem"
+                bg={"#6AB04C"}
+                color="#fff"
+                alignSelf="center"
+                isLoading 
+                spinner={<SpinnerPage cor="#fff" />}
+              >
+                Criar
+              </Button>
+            ) : (
+              <Button
+                w={{ base: "200px", md: "250px", lg: "350px" }}
+                mb="1rem"
+                bg={"#6AB04C"}
+                color="#fff"
+                alignSelf="center"
+                onClick={handleSubmit}
+                _hover={{ bg: "#579b3e" }}
+              >
+                Criar
+              </Button>
+            )}
           </Flex>
         </Flex>
         {!isMobile && (

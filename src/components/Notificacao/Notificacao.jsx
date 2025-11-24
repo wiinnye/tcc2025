@@ -5,7 +5,7 @@ export function Notificacao({ msg, tipo, descricao, onClose }) {
   useEffect(() => {
     const timer = setTimeout(() => {
       if (onClose) onClose();
-    }, 2000);
+    }, 5000);
     return () => clearTimeout(timer);
   }, [onClose]);
 

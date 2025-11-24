@@ -15,8 +15,8 @@ import MenuUsuario from "../../components/Menu/Menu";
 import { useState } from "react";
 import bgFuntlibra from "../../image/bgFuntlibra.png";
 import { IoEyeSharp, IoEyeOff } from "react-icons/io5";
-import { auth, db } from "../../services/firebase";
-import { createUserWithEmailAndPassword } from "firebase/auth";
+import {  db } from "../../services/firebase";
+import { createUserWithEmailAndPassword, getAuth } from "firebase/auth"; 
 import { doc, setDoc } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { RiArrowLeftLine } from "react-icons/ri";
@@ -38,6 +38,8 @@ export function CadastroAdm() {
   const [erroEmail, setErroEmail] = useState("");
   const [notificacao, setNotificacao] = useState(null);
   const [carregando, setCarregando] = useState(false);
+
+  const firebaseAuth = getAuth();
 
   const handleSubmit = async () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -66,41 +68,70 @@ export function CadastroAdm() {
     }
 
     setCarregando(true);
+
+    const currentUser = firebaseAuth.currentUser;
+
+    if (!currentUser) {
+      setNotificacao({
+        msg: "Erro: Nenhuma sessão de administrador ativa.",
+        descricao: "Faça login novamente para realizar o cadastro.",
+        tipo: "erro",
+      });
+      setCarregando(false);
+      return;
+    }
+
+    let novoUsuarioUid = null;
+
     try {
-      // Cria usuário no Firebase Authentication
       const userCredential = await createUserWithEmailAndPassword(
-        auth,
+        firebaseAuth,
         emailAdm,
         senha
       );
-      const user = userCredential.user;
+      const newUser = userCredential.user;
+      novoUsuarioUid = newUser.uid; 
 
-      await setDoc(doc(db, "usuarios", user.uid), {
+      await setDoc(doc(db, "usuarios", newUser.uid), {
         nome: nomeAdm,
         email: emailAdm,
-        senha: senha,
+        senha: senha, 
         tipo: "adm",
       });
 
-      setNotificacao("");
+      await firebaseAuth.updateCurrentUser(currentUser);
+
       setNotificacao({
         msg: "Conta criada com sucesso!",
+        descricao: `O novo administrador ${nomeAdm} foi cadastrado!`,
         tipo: "sucesso",
       });
-      // navigate("/login");
+
+      setSenha("");
+      setNomeAdm("");
+      setEmailAdm("");
+      setConfirmarSenha("");
     } catch (erro) {
-      setCarregando(false);
-    if (erro.code === 'auth/email-already-in-use') {
-      setNotificacao({
-        msg:'Este E-mail já está cadastrado!',
-        descricao:"Tente fazer login ou use outro E-mail",
-        tipo:"erro"})
-    }else{
-      setNotificacao({
-        msg: "Erro ao criar usuário. Verifique os dados.",
-        tipo: "erro",
-      });
+      if (firebaseAuth.currentUser?.uid === novoUsuarioUid && currentUser) {
+        await firebaseAuth.updateCurrentUser(currentUser);
       }
+
+      if (erro.code === "auth/email-already-in-use") {
+        setNotificacao({
+          msg: "Este E-mail já está cadastrado!",
+          descricao: "Tente fazer login ou use outro E-mail",
+          tipo: "erro",
+        });
+      } else {
+        console.error("Erro no cadastro:", erro);
+        setNotificacao({
+          msg: "Erro ao criar usuário.",
+          descricao: `Código: ${erro.code}`,
+          tipo: "erro",
+        });
+      }
+    } finally {
+      setCarregando(false);
     }
   };
 
@@ -237,6 +268,7 @@ export function CadastroAdm() {
                   position="absolute"
                   right="10px"
                   top="50%"
+                  alignSelf="center"
                   transform="translateY(-50%)"
                   cursor="pointer"
                   onClick={() => setShowConfirmarSenha(!showConfirmarSenha)}
@@ -268,7 +300,6 @@ export function CadastroAdm() {
                   bg={"#6AB04C"}
                   color="#fff"
                   alignSelf="center"
-                  onClick={handleSubmit}
                 >
                   <SpinnerPage cor="#fff" />
                 </Button>
