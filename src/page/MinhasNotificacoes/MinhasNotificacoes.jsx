@@ -26,16 +26,15 @@ import ToolTipContainer from "../../components/ToolTip/ToolTip";
 import { RiArrowLeftLine } from "react-icons/ri";
 import { useNavigate } from "react-router-dom";
 
-export function NotificacaoVideo() {
+export function MinhasNotificacoes() {
   const [notificacoes, setNotificacoes] = useState([]);
   const [carregando, setCarregando] = useState(true);
   const [notificacaoSelecionada, setNotificacaoSelecionada] = useState(null);
+  const [authInicializado, setAuthInicializado] = useState(false);
   const navigate = useNavigate();
 
   const auth = getAuth();
   const user = auth.currentUser;
-
-  const [authInicializado, setAuthInicializado] = useState(false);
 
   const capitalizeName = (name) => {
     if (!name) return "";
@@ -50,7 +49,6 @@ export function NotificacaoVideo() {
   };
 
   useEffect(() => {
-    // Listener para saber quando o Auth está pronto
     const unsubscribe = auth.onAuthStateChanged((user) => {
       setAuthInicializado(true);
     });
@@ -60,35 +58,66 @@ export function NotificacaoVideo() {
 
   useEffect(() => {
     const buscarNotificacoes = async () => {
-      //Se o Auth não está inicializado ou o usuário não está logado/sem email, interrompe.
-      if (!authInicializado || !user || !user.email) {
+      if (!authInicializado || !user || !user.email || !user.uid) {
         setCarregando(false);
         return;
       }
 
       try {
-        const q = query(
+        const qRecusa = query(
           collection(db, "notificacoes_recusa"),
-          //Filtra todas as notificações pelo email do usuário logado.
           where("interpreteEmail", "==", user.email)
         );
 
-        const snapshot = await getDocs(q);
-        const listaNotificacoes = snapshot.docs.map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }));
-
-        // Ordena da mais recente para a mais antiga
-        listaNotificacoes.sort(
-          (a, b) => b.dataRecusa.toDate() - a.dataRecusa.toDate()
+        const qFeedback = query(
+          collection(db, "feedbackAlunos"),
+          where("userId", "==", user.uid),
+          where("visto", "==", true)
         );
 
-        setNotificacoes(listaNotificacoes);
+        const [snapshotRecusa, snapshotFeedback] = await Promise.all([
+          getDocs(qRecusa),
+          getDocs(qFeedback),
+        ]);
 
-        // Define a notificação mais recente como selecionada por padrão
-        if (listaNotificacoes.length > 0) {
-          setNotificacaoSelecionada(listaNotificacoes[0]);
+        const listaRecusas = snapshotRecusa.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            tipo: "recusa",
+            tituloExibido: capitalizeName(data.videoTitulo) || "Vídeo Recusado",
+            dataExibida: data.dataRecusa?.toDate(),
+            isLida: data.notificacaoLida || false,
+          };
+        });
+
+        const listaFeedbacks = snapshotFeedback.docs.map((doc) => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            ...data,
+            tipo: "feedback",
+            motivo: "Seu feedback foi recebido e lido pelo administrador.",
+            tituloExibido: "Feedback de Aluno Visualizado",
+            dataExibida: data.timestamp?.toDate() || new Date(),
+            isLida: data.notificacaoVistaPeloAluno || false,
+          };
+        });
+
+        const listaTotal = [...listaRecusas, ...listaFeedbacks];
+        listaTotal.sort(
+          (a, b) =>
+            (b.dataExibida?.getTime() || 0) - (a.dataExibida?.getTime() || 0)
+        );
+
+        setNotificacoes(listaTotal);
+
+        const primeiraNaoLida = listaTotal.find((n) => !n.isLida);
+        if (primeiraNaoLida) {
+          setNotificacaoSelecionada(primeiraNaoLida);
+        } else if (listaTotal.length > 0) {
+          setNotificacaoSelecionada(listaTotal[0]);
         }
       } catch (error) {
         console.error("Erro ao buscar notificações:", error);
@@ -97,26 +126,45 @@ export function NotificacaoVideo() {
       }
     };
 
-    // Só busca se a autenticação já inicializou
     if (authInicializado) {
       buscarNotificacoes();
     }
   }, [user, authInicializado]);
 
   const marcarComoLida = async (notificacao) => {
-    if (notificacao.notificacaoLida) return;
+    let colecao, campoLida;
+
+    if (notificacao.tipo === "recusa") {
+      if (notificacao.notificacaoLida) return;
+      colecao = "notificacoes_recusa";
+      campoLida = "notificacaoLida";
+    } else if (notificacao.tipo === "feedback") {
+      if (notificacao.notificacaoVistaPeloAluno) return;
+      colecao = "feedbackAlunos";
+      campoLida = "notificacaoVistaPeloAluno";
+    } else {
+      return;
+    }
 
     try {
-      await updateDoc(doc(db, "notificacoes_recusa", notificacao.id), {
-        notificacaoLida: true,
+      await updateDoc(doc(db, colecao, notificacao.id), {
+        [campoLida]: true,
       });
+
       setNotificacoes((prev) =>
-        prev.map((n) =>
-          n.id === notificacao.id ? { ...n, notificacaoLida: true } : n
-        )
+        prev.map((n) => {
+          if (n.id === notificacao.id && n.tipo === notificacao.tipo) {
+            return {
+              ...n,
+              [campoLida]: true,
+              isLida: true,
+            };
+          }
+          return n;
+        })
       );
     } catch (error) {
-      console.error("Erro ao marcar como lida:", error);
+      console.error(`Erro ao marcar ${notificacao.tipo} como lida:`, error);
     }
   };
 
@@ -125,7 +173,6 @@ export function NotificacaoVideo() {
     marcarComoLida(notificacao);
   };
 
-  // --- Renderização Principal ---
   if (!authInicializado || carregando) {
     return (
       <Flex w="100%" h="100vh" justify="center" align="center">
@@ -153,7 +200,8 @@ export function NotificacaoVideo() {
       <GridItem>
         <MenuUsuario />
       </GridItem>
-      <GridItem>
+
+      <GridItem gridRow="2 / 3">
         <Flex w="100%" direction="column" justify="center" p="2rem">
           <ToolTipContainer descricao="voltar pagina">
             <Button
@@ -168,9 +216,7 @@ export function NotificacaoVideo() {
             </Button>
           </ToolTipContainer>
         </Flex>
-      </GridItem>
 
-      <GridItem>
         <Flex
           p={6}
           maxW="1200px"
@@ -179,33 +225,32 @@ export function NotificacaoVideo() {
           align="center"
         >
           <Heading as="h1" size="xl" mb={8} color="#000" alignSelf="center">
-            Minhas Notificações de Recusa de Vídeo
+            Central de Notificações
           </Heading>
 
           {notificacoes.length === 0 ? (
-            <Text status="info" variant="left-accent">
-              Você não tem nenhuma notificação de recusa de vídeo.
-            </Text>
+            <Text>Você não tem nenhuma notificação no momento.</Text>
           ) : (
             <Flex
               direction={{ base: "column", md: "row" }}
               gap={8}
-              align="center"
+              align="flex-start"
               mt="2rem"
+              w="100%"
             >
               <Box
-                w={{ base: "100%", md: "60%" }}
+                w={{ base: "100%", md: "40%" }}
                 maxH="200px"
                 overflowY="auto"
                 pr={2}
               >
                 <Text fontSize="lg" fontWeight="semibold" mb={3}>
-                  Histórico de notificações:
+                  Histórico:
                 </Text>
                 <VStack spacing={3} align="stretch">
                   {notificacoes.map((n) => (
                     <Flex
-                      key={n.id}
+                      key={`${n.tipo}-${n.id}`}
                       p={4}
                       borderWidth="1px"
                       borderRadius="lg"
@@ -214,14 +259,20 @@ export function NotificacaoVideo() {
                       }
                       bg={
                         n.id === notificacaoSelecionada?.id
-                          ? "red.100"
-                          : n.notificacaoLida
+                          ? n.tipo === "recusa"
+                            ? "red.100"
+                            : "green.100"
+                          : n.isLida
                           ? "gray.50"
-                          : "red.50"
+                          : n.tipo === "recusa"
+                          ? "red.50"
+                          : "green.50"
                       }
                       borderColor={
                         n.id === notificacaoSelecionada?.id
-                          ? "red.400"
+                          ? n.tipo === "recusa"
+                            ? "red.400"
+                            : "green.400"
                           : "gray.200"
                       }
                       cursor="pointer"
@@ -233,18 +284,30 @@ export function NotificacaoVideo() {
                       <Box>
                         <Text
                           fontWeight="bold"
-                          color={n.notificacaoLida ? "gray.700" : "red.700"}
+                          color={
+                            n.isLida
+                              ? "gray.700"
+                              : n.tipo === "recusa"
+                              ? "red.700"
+                              : "green.700"
+                          }
                         >
-                          {capitalizeName(n.videoTitulo)}
+                          {n.tituloExibido}
                         </Text>
                         <Text fontSize="xs" color="gray.500">
-                          Enviado em:{" "}
-                          {n.dataRecusa?.toDate().toLocaleDateString("pt-BR") ||
+                          {n.tipo === "recusa"
+                            ? "Recusado em: "
+                            : "Visualizado em: "}
+                          {n.dataExibida?.toLocaleDateString("pt-BR") ||
                             "Data indisponível"}
                         </Text>
                       </Box>
-                      {!n.notificacaoLida && (
-                        <Text color="red.500" fontWeight="bold" fontSize="sm">
+                      {!n.isLida && (
+                        <Text
+                          color={n.tipo === "recusa" ? "red.500" : "green.500"}
+                          fontWeight="bold"
+                          fontSize="sm"
+                        >
                           NOVA
                         </Text>
                       )}
@@ -254,34 +317,57 @@ export function NotificacaoVideo() {
               </Box>
 
               <Box
-                w={{ base: "100%", md: "600px" }}
+                w={{ base: "100%", md: "60%" }}
                 p={4}
                 borderWidth="1px"
                 borderRadius="lg"
                 bg="white"
+                boxShadow="xl"
               >
                 <Heading as="h2" size="md" mb={4} color="gray.500">
-                  Detalhes e Comentário sobre:
+                  Detalhes da Notificação
                 </Heading>
 
                 {notificacaoSelecionada ? (
                   <Flex w="100%" align="start" spacing={5} direction="column">
-                    <Text fontWeight="medium" fontSize="lg">
-                      Vídeo:{" "}
-                      {capitalizeName(notificacaoSelecionada.videoTitulo)}
+                    <Text fontWeight="medium" fontSize="lg" mb={3}>
+                      {notificacaoSelecionada.tipo === "recusa"
+                        ? "Vídeo: "
+                        : "Assunto: "}
+                      <Text as="span" fontWeight="bold">
+                        {notificacaoSelecionada.tituloExibido}
+                      </Text>
                     </Text>
 
                     <Box
                       p={4}
-                      bg="red.50"
+                      bg={
+                        notificacaoSelecionada.tipo === "recusa"
+                          ? "red.50"
+                          : "green.50"
+                      }
                       borderRadius="md"
                       w="100%"
                       border="1px solid"
-                      borderColor="red.200"
+                      borderColor={
+                        notificacaoSelecionada.tipo === "recusa"
+                          ? "red.200"
+                          : "green.200"
+                      }
                       mt=".8rem"
                     >
-                      <Text fontWeight="bold" mb={2} color="red.700">
-                        Comentário do Administrador:
+                      <Text
+                        fontWeight="bold"
+                        mb={2}
+                        color={
+                          notificacaoSelecionada.tipo === "recusa"
+                            ? "red.700"
+                            : "green.700"
+                        }
+                      >
+                        {notificacaoSelecionada.tipo === "recusa"
+                          ? "Comentário do Administrador (Motivo da Recusa):"
+                          : "Status do Feedback:"}
                       </Text>
                       <Text whiteSpace="pre-wrap" mt=".8rem">
                         {notificacaoSelecionada.motivo}
@@ -289,10 +375,12 @@ export function NotificacaoVideo() {
                     </Box>
 
                     <Text fontSize="sm" color="gray.500" mt="1rem">
-                      Recusado em:{" "}
-                      {notificacaoSelecionada.dataRecusa
-                        ?.toDate()
-                        .toLocaleString("pt-BR") || "Data indisponível"}
+                      {notificacaoSelecionada.tipo === "recusa"
+                        ? "Recusado em: "
+                        : "Data de Visualização do Admin: "}
+                      {notificacaoSelecionada.dataExibida?.toLocaleString(
+                        "pt-BR"
+                      ) || "Data indisponível"}
                     </Text>
                   </Flex>
                 ) : (

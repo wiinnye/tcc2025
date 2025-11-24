@@ -18,7 +18,7 @@ import { QuemSomos } from "./page/QuemSomos/QuemSomos";
 import { CadastroAdm } from "./page/CadastroAdm/cadastroAdm";
 import { RotaPrivada } from "./page/Rotas/RotaPrivada"
 import { FeedBack } from "./page/FeedBack/FeedBack";
-import { NotificacaoVideo } from "./page/NotificacaoVideo/NotificacaoVideo";
+import { MinhasNotificacoes } from "./page/MinhasNotificacoes/MinhasNotificacoes";
 
 
 export default function App() {
@@ -88,7 +88,7 @@ export default function App() {
             <Route path="/categorias" element={<Categorias />} />
             <Route path="/quemSomos" element={<QuemSomos />} />
             <Route path="/feedback" element={<FeedBack />} />
-            <Route path="/notificacoes" element={<NotificacaoVideo />} />
+            <Route path="/notificacoes" element={<MinhasNotificacoes />} />
 
             <Route path="*" element={<Home />} /> {/* fallback */}
           </>

@@ -91,10 +91,18 @@ export function VideoMostrar() {
         setVideos(novaLista);
 
         setNotificacao(true);
+        notificacao({
+          msg: "Vídeo excluido com sucesso!:",
+          tipo: "sucesso",
+        });
         navigate("/categorias");
       }
     } catch (erro) {
-      notificacao("Erro ao excluir vídeo:", erro);
+      notificacao({
+        msg: "Erro ao excluir vídeo:",
+        descricao: erro,
+        tipo: "erro",
+      });
     }
   };
 
@@ -266,7 +274,9 @@ export function VideoMostrar() {
 
         {notificacao && (
           <Notificacao
-            mensagem="Vídeo Excluído com sucesso!"
+            msg={notificacao?.msg}
+            tipo={notificacao?.tipo}
+            descricao={notificacao?.descricao}
             onClose={() => setNotificacao(false)}
           />
         )}

@@ -21,8 +21,7 @@ import { MenuLink } from "../MenuLink/MenuLink";
 import { menusPorTipo } from "../../services/menu";
 import { IoLogInOutline } from "react-icons/io5";
 import ToolTipContainer from "../ToolTip/ToolTip";
-import { useNotificacoesRecusa } from "../../hooks/useNotificacoesRecusa";
-// import { FaCircle } from "react-icons/fa";
+import { useNotificacoes } from "../../hooks/useNotificacoes";
 import { FaBell } from "react-icons/fa6";
 
 export default function MenuUsuario() {
@@ -33,9 +32,9 @@ export default function MenuUsuario() {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const menus = menusPorTipo[usuario?.tipo] || [];
 
-  const { contador, ultimaNotificacao } = useNotificacoesRecusa();
+  const { contador } = useNotificacoes();
 
-  const tiposAutorizados = ["interprete", "adm"];
+  const tiposAutorizados = ["interprete", "adm", "aluno"];
 
   const capitalizeName = (name) => {
     if (!name) return "";
@@ -107,7 +106,7 @@ export default function MenuUsuario() {
               <ToolTipContainer
                 descricao={
                   contador > 0
-                    ? `último vídeo enviado ${ultimaNotificacao?.videoTitulo.toUpperCase()} recusado!`
+                    ? (contador >= 2 ? "novas notificações" : "nova notificação")
                     : "Nenhuma nova notificação"
                 }
               >
