@@ -47,7 +47,6 @@ export function UploadVideo() {
         if (docSnap.exists()) {
           const data = docSnap.data();
           const listaVideos = data.lista || [];
-          console.log(listaVideos);
 
           const listaCategorias = listaVideos.map((video) => {
             const categoriaKey = video.categoria || "sem_categoria";
@@ -151,7 +150,7 @@ export function UploadVideo() {
             <Flex w="100%" h="20%" justify="start" align="center" pl="2rem">
               <ToolTipContainer descricao="voltar pagina">
                 <Button
-                  w={{ sm: "15%", lg: "20%" }}
+                  w={{ base: "20%", lg: "20%" }}
                   bg="#579b3e"
                   onClick={() => navigate("/login")}
                 >

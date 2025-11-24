@@ -48,7 +48,7 @@ export function FeedBack() {
         <Flex w="100%" direction="column" justify="center" p="2rem">
           <ToolTipContainer descricao="voltar pagina">
             <Button
-              w={{ base: "15%", lg: "10%" }}
+              w={{ base: "20%", lg: "10%" }}
               bg="#4cb04c"
               mb={4}
               onClick={() => {

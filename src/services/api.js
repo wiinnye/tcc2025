@@ -105,7 +105,7 @@ export async function salvarVideoPendente(titulo, url, categoria, interpreteId, 
     interpreteId,
     interpreteEmail,
     status: "pendente",
-    createdAt: new Date()
+    createdAt: new Date(),
   });
 }
 
@@ -120,6 +120,19 @@ export async function salvarFeedbackAluno( nomeAluno, textoAluno, emailAluno, us
     visto: "false",
     createdAt: new Date()
   });
+}
+
+export async function notificacaoVideoRecusado(videoTitulo, motivo, userId){
+
+  await addDoc(collection(db, "notificacoes_recusa"), {
+    motivo: motivo,
+    videoTitulo: videoTitulo,
+    notificacaoLida: "false",
+    dataRecusa:new Date(),
+    userId: userId,
+
+  });
+
 }
 
 export function useAuth() {

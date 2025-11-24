@@ -8,6 +8,7 @@ import {
   GridItem,
   Grid,
   Badge,
+  Textarea,
 } from "@chakra-ui/react";
 import { db } from "../../services/firebase";
 import {
@@ -17,6 +18,8 @@ import {
   deleteDoc,
   updateDoc,
   arrayUnion,
+  setDoc,
+  serverTimestamp,
 } from "firebase/firestore";
 import bgCategoria from "../../image/bgCategoria.png";
 import MenuUsuario from "../../components/Menu/Menu";
@@ -34,7 +37,9 @@ export function Administrador() {
   const [carregando, setCarregando] = useState(true);
   const [mensagem, setMensagem] = useState("");
   const [videoAberto, setVideoAberto] = useState(null);
-  const navigate = useNavigate()
+  const [motivoRecusa, setMotivoRecusa] = useState("");
+  const [videoParaRecusar, setVideoParaRecusar] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const buscarPendentes = async () => {
@@ -63,6 +68,66 @@ export function Administrador() {
 
     buscarPendentes();
   }, []);
+
+  const iniciarRecusa = (video) => {
+    setVideoAberto(null);
+    setVideoParaRecusar(video);
+  };
+
+  const confirmarRecusa = async () => {
+    const video = videoParaRecusar;
+
+    const interpreteEmail = video?.interpreteEmail || "email_ausente";
+    const interpreteTipo = video?.tipo || "tipo_desconhecido";
+
+    if (!motivoRecusa.trim()) {
+      alert("O motivo da recusa é obrigatório.");
+      return;
+    }
+
+    try {
+      await setDoc(doc(db, "notificacoes_recusa", video.id), {
+        userId: video.interpreteId,
+        motivo: motivoRecusa,
+        videoTitulo: video.titulo,
+        dataRecusa: serverTimestamp(),
+        status: "recusado",
+        notificacaoLida: false,
+        interpreteEmail: interpreteEmail,
+        interpreteTipo: interpreteTipo,
+      });
+
+      await deleteDoc(doc(db, "videos_pendentes", video.id));
+
+      const novaLista = pendentes.filter((v) => v.id !== video.id);
+      setPendentes(novaLista);
+
+      const grupos = {};
+      novaLista.forEach((v) => {
+        const cat = v.categoria || "Sem Categoria";
+        grupos[cat] = grupos[cat] ? grupos[cat] + 1 : 1;
+      });
+      setCategorias(
+        Object.keys(grupos).map((cat) => ({
+          nome: cat,
+          quantidade: grupos[cat],
+        }))
+      );
+
+      // Feedback para o administrador
+      setMensagem("Vídeo recusado. Notificação enviada para o usuário!");
+      setTimeout(() => setMensagem(""), 5000);
+
+      // Limpar estados e fechar o modal
+      setVideoParaRecusar(null);
+      setMotivoRecusa("");
+      navigate("/");
+    } catch (error) {
+      console.error("Erro ao recusar vídeo:", error);
+      setMensagem("🚨 Erro ao recusar!");
+      setTimeout(() => setMensagem(""), 5000);
+    }
+  };
 
   const aprovar = async (video) => {
     try {
@@ -101,32 +166,32 @@ export function Administrador() {
     }
   };
 
-  const recusar = async (video) => {
-    try {
-      await deleteDoc(doc(db, "videos_pendentes", video.id));
-      const novaLista = pendentes.filter((v) => v.id !== video.id);
-      setPendentes(novaLista);
+  // const recusar = async (video) => {
+  //   try {
+  //     await deleteDoc(doc(db, "videos_pendentes", video.id));
+  //     const novaLista = pendentes.filter((v) => v.id !== video.id);
+  //     setPendentes(novaLista);
 
-      const grupos = {};
-      novaLista.forEach((v) => {
-        const cat = v.categoria || "Sem Categoria";
-        grupos[cat] = grupos[cat] ? grupos[cat] + 1 : 1;
-      });
+  //     const grupos = {};
+  //     novaLista.forEach((v) => {
+  //       const cat = v.categoria || "Sem Categoria";
+  //       grupos[cat] = grupos[cat] ? grupos[cat] + 1 : 1;
+  //     });
 
-      setCategorias(
-        Object.keys(grupos).map((cat) => ({
-          nome: cat,
-          quantidade: grupos[cat],
-        }))
-      );
+  //     setCategorias(
+  //       Object.keys(grupos).map((cat) => ({
+  //         nome: cat,
+  //         quantidade: grupos[cat],
+  //       }))
+  //     );
 
-      setMensagem(" Vídeo recusado!");
-      setTimeout(() => setMensagem(""), 5000);
-      setVideoAberto(null);
-    } catch (error) {
-      console.error("Erro:", error);
-    }
-  };
+  //     setMensagem(" Vídeo recusado!");
+  //     setTimeout(() => setMensagem(""), 5000);
+  //     setVideoAberto(null);
+  //   } catch (error) {
+  //     console.error("Erro:", error);
+  //   }
+  // };
   const videoSelecionado = pendentes.find((vid) => vid.id === videoAberto);
 
   const formatarTimestamp = (timestamp) => {
@@ -146,32 +211,51 @@ export function Administrador() {
     return `${dataFormatada} às ${horaFormatada}`;
   };
 
+  const capitalizeName = (name) => {
+    if (!name) return "";
+
+    const lowerName = name.toLowerCase();
+    const capitalizedWords = lowerName.split(" ").map((word) => {
+      if (word.length === 0) return "";
+      return word.charAt(0).toUpperCase() + word.slice(1);
+    });
+
+    return capitalizedWords.join(" ");
+  };
   return (
-    <Grid w="100%" h="100%" templateColumns="repeat(1, 5fr)" gap={3}>
-      <GridItem w="100%" h="100">
+    <Grid
+      w="100%"
+      minH="100vh"
+      templateColumns="1fr"
+      templateRows="auto auto 1fr auto"
+      gap={3}
+    >
+      <GridItem w="100%" h={{ lg: "50%" }}>
         <MenuUsuario />
       </GridItem>
 
       {!categoriaSelecionada ? (
         <GridItem
           w="100%"
-          h="100"
+          h="100%"
           p={{ base: ".6rem", md: "1rem" }}
           mt={{ base: "3rem", md: "2rem" }}
+          gridRow="2"
         >
-          <ToolTipContainer descricao='voltar pagina'>
+          <ToolTipContainer descricao="voltar pagina">
             <Button
               w={{ base: "20%", md: "10%" }}
               bg="#4cb04c"
               mb={4}
               onClick={() => {
-                navigate("/tradutor")
+                navigate("/tradutor");
               }}
             >
               <RiArrowLeftLine />
             </Button>
           </ToolTipContainer>
-        </GridItem>) :
+        </GridItem>
+      ) : (
         <GridItem
           w="100%"
           h="100"
@@ -190,9 +274,9 @@ export function Administrador() {
             <RiArrowLeftLine />
           </Button>
         </GridItem>
-      }
+      )}
 
-      <GridItem w="100%" h="100" p="1rem">
+      <GridItem w="100%" p="1rem" gridRow="3 / 4">
         <Text
           fontSize={{ base: "xl", md: "2xl" }}
           fontWeight="bold"
@@ -201,8 +285,17 @@ export function Administrador() {
         >
           Revisão de Vídeos
         </Text>
+        {!categoriaSelecionada ? (
+          <Text fontSize={{ base: "xl", md: "2xl" }} ml="3rem">
+            Verifique as categorias abaixo:
+          </Text>
+        ) : (
+          <Text fontSize={{ base: "xl", md: "2xl" }} ml="3rem">
+            Videos para revisão da categoria:{" "}
+            {capitalizeName(categoriaSelecionada)}
+          </Text>
+        )}
 
-    
         {carregando ? (
           <Spinner size="lg" color="#6AB04C" />
         ) : (
@@ -211,17 +304,18 @@ export function Administrador() {
               <Flex
                 wrap="wrap"
                 justify="center"
-                align="center"
+                align="flex-start"
                 gap={3}
                 w="100%"
                 h="auto"
+                overflowY="auto"
               >
                 {categorias.map((categ) => (
                   <Flex
                     key={categ.nome}
                     cursor="pointer"
-                    w={{ base: "120px", md: "200px", lg: "300px" }}
-                    h={{ base: "120px", md: "200px", lg: "350px" }}
+                    w={{ base: "230px", md: "200px", lg: "300px" }}
+                    h={{ base: "250px", md: "200px", lg: "350px" }}
                     direction="column"
                     align="center"
                     justify="center"
@@ -234,12 +328,11 @@ export function Administrador() {
                     onClick={() => setCategoriaSelecionada(categ.nome)}
                     position="relative"
                   >
-
                     {categ.quantidade > 0 && (
-                      <ToolTipContainer descricao='quantidade video pendente'>
+                      <ToolTipContainer descricao="quantidade video pendente">
                         <Badge
                           bg="#ae1212ff"
-                          color='#fff'
+                          color="#fff"
                           borderRadius="full"
                           px={3}
                           py={1}
@@ -255,7 +348,7 @@ export function Administrador() {
                     )}
 
                     <Text
-                      mb={{ base: "3rem", md: "124px", lg: "110px" }}
+                      mb={{ base: "5rem", md: "124px", lg: "110px" }}
                       fontWeight="bold"
                       color="#fff"
                       fontSize={{ base: "md", md: "24px", lg: "26px" }}
@@ -304,7 +397,7 @@ export function Administrador() {
                             {v.titulo.toUpperCase()}
                           </Text>
                           <Text fontSize="sm" color="gray.500">
-                             Enviado em:: {formatarTimestamp(v.createdAt)}
+                            Enviado em:: {formatarTimestamp(v.createdAt)}
                           </Text>
                           <Text fontSize="sm" color="gray.500">
                             Enviado por: {v.interpreteEmail || "Não informado"}
@@ -382,16 +475,19 @@ export function Administrador() {
                                   <Button
                                     w="20%"
                                     bg="green"
-                                    color="white"
+                                    color="#fff"
                                     onClick={() => aprovar(v)}
                                   >
                                     Aprovar
                                   </Button>
+
                                   <Button
                                     w="20%"
                                     bg="red"
-                                    color="white"
-                                    onClick={() => recusar(v)}
+                                    color="#fff"
+                                    onClick={() =>
+                                      iniciarRecusa(videoSelecionado)
+                                    }
                                   >
                                     <FaRegTrashAlt />
                                   </Button>
@@ -409,7 +505,69 @@ export function Administrador() {
         )}
       </GridItem>
 
-      <GridItem>
+      {videoParaRecusar && (
+        <Flex
+          position="fixed"
+          top="0"
+          left="0"
+          w="100%"
+          h="100%"
+          bg="rgba(0,0,0,2)"
+          align="center"
+          justify="center"
+          p={4}
+          zIndex="1000"
+        >
+          <Flex
+            direction="column"
+            bg="#fff"
+            borderRadius="lg"
+            p={6}
+            w="90%"
+            maxW="450px"
+            boxShadow="2xl"
+          >
+            <Text fontSize="xl" fontWeight="bold" mb={4} color="red.600">
+              Recusar Vídeo?
+            </Text>
+            <Text mb={3}>
+              Por favor, digite o motivo da recusa. Este motivo será enviado
+              para o usuário.
+            </Text>
+            <Textarea
+              placeholder="Ex: O vídeo não está com a iluminação adequada ou a tradução está incorreta."
+              value={motivoRecusa}
+              onChange={(e) => setMotivoRecusa(e.target.value)}
+              mb={6}
+              minH="120px"
+              resize="none"
+            />
+            <Flex justify="space-between" w="100%">
+              <Button
+                bg="red.500"
+                p="1rem"
+                onClick={() => {
+                  setVideoParaRecusar(null);
+                  setMotivoRecusa("");
+                }}
+              >
+                Cancelar
+              </Button>
+              <Button
+                onClick={confirmarRecusa}
+                isDisabled={!motivoRecusa.trim()}
+                p="1rem"
+                bg="green"
+                color="#fff"
+              >
+                Confirmar Recusa
+              </Button>
+            </Flex>
+          </Flex>
+        </Flex>
+      )}
+
+      <GridItem gridRow="4 / 5">
         <Footer />
       </GridItem>
 

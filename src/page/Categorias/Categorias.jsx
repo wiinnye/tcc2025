@@ -17,7 +17,7 @@ export function Categorias() {
   const navigate = useNavigate();
   const [busca, setBusca] = useState("");
 
-useEffect(() => {
+  useEffect(() => {
     const buscarCategorias = async () => {
       try {
         const docRef = doc(db, "videos", "libra");
@@ -84,7 +84,7 @@ useEffect(() => {
           />
         </Flex>
         <GridItem>
-           <Text
+          <Text
             fontSize={{ base: "xl", md: "2xl" }}
             fontWeight="bold"
             textAlign="center"
@@ -92,15 +92,12 @@ useEffect(() => {
             Confira as Linguagens Disponíveis:
           </Text>
         </GridItem>
-      </GridItem>
-      <GridItem>
-        <Text
-          fontSize={{ base: "xl", md: "2xl" }}
-          fontWeight="bold"
-          textAlign="center"
-        >
-          Confira as Linguagens Disponíveis:
-        </Text>
+
+        <GridItem>
+          <Text fontSize={{ base: "xl", md: "2xl" }} textAlign="center">
+            Selecione a categoria desejada:
+          </Text>
+        </GridItem>
       </GridItem>
       <GridItem w="100%" h="100%">
         {carregando ? (
@@ -111,19 +108,13 @@ useEffect(() => {
           </Text>
         ) : (
           <>
-            <Flex
-              w="100%"
-              minH="100%"
-              justify="center"
-              align="center"
-              gap={3}
-            >
+            <Flex w="100%" minH="100%" justify="center" align="center" gap={3}>
               {categoriasFiltradas.map((categoria, index) => (
                 <Flex
                   key={index}
                   cursor="pointer"
-                w={{ base: "200px", md: "200px", lg: "300px" }}
-                    h={{ base: "150px", md: "200px", lg: "350px" }}
+                  w={{ base: "200px", md: "200px", lg: "300px" }}
+                  h={{ base: "150px", md: "200px", lg: "350px" }}
                   direction="column"
                   align="center"
                   justify="center"
@@ -133,7 +124,7 @@ useEffect(() => {
                   backgroundSize="contain"
                   backgroundRepeat="no-repeat"
                   backgroundPosition="center"
-                 onClick={() => navigate(`/traducao/categoria/${categoria}`)}
+                  onClick={() => navigate(`/traducao/categoria/${categoria}`)}
                 >
                   <Text
                     mb={{ base: "3rem", md: "124px", lg: "110px" }}

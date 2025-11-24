@@ -18,9 +18,8 @@ import { QuemSomos } from "./page/QuemSomos/QuemSomos";
 import { CadastroAdm } from "./page/CadastroAdm/cadastroAdm";
 import { RotaPrivada } from "./page/Rotas/RotaPrivada"
 import { FeedBack } from "./page/FeedBack/FeedBack";
+import { NotificacaoVideo } from "./page/NotificacaoVideo/NotificacaoVideo";
 
-
-// 🔹 Componente de rota protegida
 
 export default function App() {
   const [usuario, setUsuario] = useState(null);
@@ -29,14 +28,13 @@ export default function App() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // 🔹 Buscar o "tipo" no Firestore
         const docRef = doc(db, "usuarios", user.uid);
         const docSnap = await getDoc(docRef);
 
         if (docSnap.exists()) {
           setUsuario({ ...user, tipo: docSnap.data().tipo });
         } else {
-          setUsuario(user); // fallback se não tiver dados extras
+          setUsuario(user); 
         }
       } else {
         setUsuario(null);
@@ -90,6 +88,7 @@ export default function App() {
             <Route path="/categorias" element={<Categorias />} />
             <Route path="/quemSomos" element={<QuemSomos />} />
             <Route path="/feedback" element={<FeedBack />} />
+            <Route path="/notificacoes" element={<NotificacaoVideo />} />
 
             <Route path="*" element={<Home />} /> {/* fallback */}
           </>

@@ -8,6 +8,7 @@ import {
   Portal,
   useBreakpointValue,
   Icon,
+  Badge,
 } from "@chakra-ui/react";
 import { RiMenuFill } from "react-icons/ri";
 import { useEffect, useState } from "react";
@@ -20,6 +21,9 @@ import { MenuLink } from "../MenuLink/MenuLink";
 import { menusPorTipo } from "../../services/menu";
 import { IoLogInOutline } from "react-icons/io5";
 import ToolTipContainer from "../ToolTip/ToolTip";
+import { useNotificacoesRecusa } from "../../hooks/useNotificacoesRecusa";
+// import { FaCircle } from "react-icons/fa";
+import { FaBell } from "react-icons/fa6";
 
 export default function MenuUsuario() {
   const [usuario, setUsuario] = useState(null);
@@ -29,18 +33,21 @@ export default function MenuUsuario() {
   const isMobile = useBreakpointValue({ base: true, md: false });
   const menus = menusPorTipo[usuario?.tipo] || [];
 
+  const { contador, ultimaNotificacao } = useNotificacoesRecusa();
+
+  const tiposAutorizados = ["interprete", "adm"];
+
   const capitalizeName = (name) => {
-    if (!name) return '';
-    
+    if (!name) return "";
+
     const lowerName = name.toLowerCase();
-    const capitalizedWords = lowerName.split(' ').map((word) => {
-      if (word.length === 0) return '';
+    const capitalizedWords = lowerName.split(" ").map((word) => {
+      if (word.length === 0) return "";
       return word.charAt(0).toUpperCase() + word.slice(1);
     });
 
-    return capitalizedWords.join(' ');
+    return capitalizedWords.join(" ");
   };
-
 
   useEffect(() => {
     const buscarUsuario = async () => {
@@ -68,9 +75,12 @@ export default function MenuUsuario() {
   const handleLogout = async () => {
     const auth = getAuth();
     await signOut(auth);
-    navigate("/"); 
+    navigate("/");
   };
 
+  const handleNotificacaoClick = () => {
+    navigate("/notificacoes");
+  };
 
   return (
     <Flex w="100%" h="100%" bg="#4cb04c" direction="column" boxShadow="sm">
@@ -79,7 +89,7 @@ export default function MenuUsuario() {
       {!carregando && usuario && (
         <Flex w="100%" h="100%" justify="space-between" p={3} align="center">
           <Flex align="center" gap={3}>
-            <Box textAlign="left" color="white" ml='1.5rem'>
+            <Box textAlign="left" color="white" ml="1.5rem">
               <Text
                 fontSize={{ sm: "18px", md: "24px", lg: "24px" }}
                 fontWeight="bold"
@@ -91,17 +101,61 @@ export default function MenuUsuario() {
               </Text>
             </Box>
           </Flex>
-          <ToolTipContainer descricao='sair da conta'>
-            <Button
-              cursor="pointer"
-              color="#fff"
-              pr="1.5rem"
-              bg="#4cb04c"
-              onClick={handleLogout}
-            >
-              <Icon as={IoLogInOutline} w={10} h={10} />
-            </Button>
-          </ToolTipContainer>
+
+          <Flex align="center" gap={2}>
+            {tiposAutorizados.includes(usuario?.tipo) && (
+              <ToolTipContainer
+                descricao={
+                  contador > 0
+                    ? `último vídeo enviado ${ultimaNotificacao?.videoTitulo.toUpperCase()} recusado!`
+                    : "Nenhuma nova notificação"
+                }
+              >
+                <Button
+                  cursor="pointer"
+                  color="white"
+                  bg="#4cb04c"
+                  onClick={handleNotificacaoClick}
+                  p={0}
+                  _hover={{ bg: "#3a8c3a" }}
+                  position="relative"
+                >
+                  <Icon as={FaBell} w={7} h={7} />
+
+                  {contador > 0 && (
+                    <Badge
+                      bg="#d61212"
+                      color="#fff"
+                      borderRadius="full"
+                      px={2}
+                      py={1}
+                      fontSize="0.7em"
+                      position="absolute"
+                      top="-8px"
+                      right="-6px"
+                      minWidth="20px"
+                      textAlign="center"
+                      border="2px solid #4cb04c"
+                    >
+                      {contador}
+                    </Badge>
+                  )}
+                </Button>
+              </ToolTipContainer>
+            )}
+
+            <ToolTipContainer descricao="sair da conta">
+              <Button
+                cursor="pointer"
+                color="#fff"
+                pr="1.5rem"
+                bg="#4cb04c"
+                onClick={handleLogout}
+              >
+                <Icon as={IoLogInOutline} w={10} h={10} />
+              </Button>
+            </ToolTipContainer>
+          </Flex>
         </Flex>
       )}
 
