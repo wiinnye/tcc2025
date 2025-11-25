@@ -11,8 +11,8 @@ import ToolTipContainer from "../../components/ToolTip/ToolTip";
 import bgFuntlibra from "../../image/bgFuntlibra.png";
 import { useState } from "react";
 import { IoEyeOff, IoEyeSharp } from "react-icons/io5";
-import { db } from "../../services/firebase";
-import { createUserWithEmailAndPassword, getAuth } from "firebase/auth"; 
+import { auth, db } from "../../services/firebase";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 import InputMask from "react-input-mask";
 import { useNavigate } from "react-router-dom";
 import { doc, setDoc } from "firebase/firestore";
@@ -30,22 +30,21 @@ export function CadastroInterprete() {
   const [confirmarSenha, setConfirmarSenha] = useState("");
   const [showSenha, setShowSenha] = useState(false);
   const [showConfirmarSenha, setShowConfirmarSenha] = useState(false);
-  const [notificacao, setNotificacao] = useState(null); 
+  const [notificacao, setNotificacao] = useState(null);
   const [cpfInterprete, setEmailCpfInterprete] = useState("");
   const [cdiInterprete, setCdiInterprete] = useState("");
   const [erroCpf, setErroCpf] = useState("");
   const [erroSenha, setErroSenha] = useState("");
   const [erroEmail, setErroEmail] = useState("");
-  const [erroCDl, setErroCDl] = useState("");
+  const [erroCDL, setErroCDL] = useState("");
   const [erroCampos, setErroCampos] = useState("");
-  const [carregando, setCarregando] = useState(false); 
-
-  const firebaseAuth = getAuth();
+  const [carregando, setCarregando] = useState(false);
 
   function validarCPF(cpf) {
-    cpf = cpfInterprete.replace(/[^\d]+/g, "");
+    cpf = cpf.replace(/[^\d]+/g, "");
 
     if (cpf.length !== 11) return false;
+
     if (/^(\d)\1+$/.test(cpf)) return false;
 
     let soma = 0;
@@ -74,7 +73,7 @@ export function CadastroInterprete() {
 
     setErroCpf("");
     setErroSenha("");
-    setErroCDl("");
+    setErroCDL("");
     setErroCampos("");
     setErroEmail("");
 
@@ -101,7 +100,7 @@ export function CadastroInterprete() {
     }
 
     if (cdiInterprete.length < 10) {
-      setErroCDl("A CDL precisa ter no mínimo 10 caracteres.");
+      setErroCDL("A CDI precisa ter no mínimo 10 caracteres.");
       return;
     }
 
@@ -117,30 +116,15 @@ export function CadastroInterprete() {
 
     setCarregando(true);
 
-    const currentUser = firebaseAuth.currentUser;
-
-    if (!currentUser) {
-      setNotificacao({
-        msg: "Erro: Nenhuma sessão de administrador ativa.",
-        descricao: "Faça login novamente para realizar o cadastro.",
-        tipo: "erro",
-      });
-      setCarregando(false);
-      return;
-    }
-
-    let novoUsuarioUid = null;
-
     try {
       const userCredential = await createUserWithEmailAndPassword(
-        firebaseAuth, 
+        auth,
         emailInterprete,
         senha
       );
-      const newUser = userCredential.user;
-      novoUsuarioUid = newUser.uid;
+      const user = userCredential.user;
 
-      await setDoc(doc(db, "usuarios", newUser.uid), {
+      await setDoc(doc(db, "usuarios", user.uid), {
         nome: nomeInterprete,
         email: emailInterprete,
         cdi: cdiInterprete,
@@ -149,26 +133,22 @@ export function CadastroInterprete() {
         tipo: "interprete",
       });
 
-      await firebaseAuth.updateCurrentUser(currentUser);
-
-      setNotificacao({
-        msg: "Conta de Intérprete criada com sucesso!",
-        tipo: "sucesso",
-      });
+      await auth.signOut();
 
       setSenha("");
       setNomeInterprete("");
       setEmailInterprete("");
       setConfirmarSenha("");
-      setEmailCpfInterprete("");
       setCdiInterprete("");
-      navigate("/login")
+      setEmailCpfInterprete("");
+
+      setNotificacao({
+        msg: "Conta criada com sucesso!",
+        descricao: "Faça login para acessar.",
+        tipo: "sucesso",
+      });
     } catch (erro) {
-
-      if (firebaseAuth.currentUser?.uid === novoUsuarioUid && currentUser) {
-        await firebaseAuth.updateCurrentUser(currentUser);
-      }
-
+      setNotificacao(null);
       if (erro.code === "auth/email-already-in-use") {
         setNotificacao({
           msg: "Este E-mail já está cadastrado!",
@@ -179,7 +159,7 @@ export function CadastroInterprete() {
         console.error("Erro no cadastro:", erro);
         setNotificacao({
           msg: "Erro ao criar usuário.",
-          descricao: `Código: ${erro.code}. Verifique os dados.`,
+          descricao: "Verifique os dados.",
           tipo: "erro",
         });
       }
@@ -276,29 +256,31 @@ export function CadastroInterprete() {
               </Text>
             )}
             <Flex
+              w={{ base: "200px", md: "250px", lg: "350px" }}
+              flexDirection={{ base: "column", md: "row" }}
               alignSelf="center"
               alignItems="center"
               justify="space-around"
-              px=".5rem"
-              w={{ base: "200px", md: "250px", lg: "350px" }}
             >
               <Input
-                w="50%"
+                w={{ base: "200px", md: "250px", lg: "50%" }}
                 mb="1rem"
+                padding=".5rem"
+                color='#000'
                 placeholder="CDI"
-                pr=".5rem"
-                borderColor={!erroCDl && !erroCampos ? "#DEF5DE" : "red"}
+                borderColor={!erroCDL && !erroCampos ? "#DEF5DE" : "red"}
                 value={cdiInterprete}
                 onChange={(e) => setCdiInterprete(e.target.value)}
               />
 
               <Input
-                w="50%"
+                w={{ base: "200px", md: "250px", lg: "50%" }}
                 mb="1rem"
+                padding=".5rem"
                 as={InputMask}
                 mask="999.999.999-99"
                 placeholder="CPF"
-                ml=".5rem"
+                ml={{md:".5rem"}}
                 borderColor={!erroCpf && !erroCampos ? "#DEF5DE" : "red"}
                 error={erroCpf}
                 value={cpfInterprete}
@@ -306,16 +288,28 @@ export function CadastroInterprete() {
               />
             </Flex>
 
-            {erroCpf && (
-              <Text color="red" fontSize="sm" ml="52%" mb="1rem">
-                {erroCpf}
-              </Text>
-            )}
-            {erroCDl && (
-              <Text color="red" fontSize="sm" ml="4.7rem" mb="1rem">
-                {erroCDl}
-              </Text>
-            )}
+            <Flex
+              w={{ base: "200px", md: "250px", lg: "350px" }}
+              flexDirection="row"
+              alignSelf="center"
+              justify="space-between"
+              mb="1rem"
+            >
+              <Box w="50%" pr=".5rem">
+                {erroCDL && (
+                  <Text color="red" fontSize="sm" mt="-1rem">
+                    {erroCDL}
+                  </Text>
+                )}
+              </Box>
+              <Box w="50%" pl=".5rem">
+                {erroCpf && (
+                  <Text color="red" fontSize="sm" mt="-1rem">
+                    {erroCpf}
+                  </Text>
+                )}
+              </Box>
+            </Flex>
 
             {/* Senha */}
             <Box
@@ -408,10 +402,9 @@ export function CadastroInterprete() {
                 bg={"#6AB04C"}
                 color="#fff"
                 alignSelf="center"
-                isLoading 
-                spinner={<SpinnerPage cor="#fff" />}
+                isLoading
               >
-                Criar
+                <SpinnerPage cor="#fff" />
               </Button>
             ) : (
               <Button
@@ -421,7 +414,6 @@ export function CadastroInterprete() {
                 color="#fff"
                 alignSelf="center"
                 onClick={handleSubmit}
-                _hover={{ bg: "#579b3e" }}
               >
                 Criar
               </Button>
