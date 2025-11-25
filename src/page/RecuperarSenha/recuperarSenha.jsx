@@ -34,7 +34,8 @@ import { IoEyeOff, IoEyeSharp } from "react-icons/io5";
 import { Notificacao } from "../../components/Notificacao/Notificacao";
 import ToolTipContainer from "../../components/ToolTip/ToolTip";
 import MenuUsuario from "../../components/Menu/Menu";
-import Footer  from "../../components/Footer/Footer";
+import Footer from "../../components/Footer/Footer";
+import { SpinnerPage } from "../../components/Spinner/Spinner";
 
 export function RecuperarSenha() {
   const [showSenhaAtual, setShowSenhaAtual] = useState(false);
@@ -50,6 +51,7 @@ export function RecuperarSenha() {
   const [erroNova, setErroNova] = useState("");
   const [erroConfirmar, setErroConfirmar] = useState("");
   const [notificacao, setNotificacao] = useState(null);
+   const [carregando, setCarregando] = useState(false);
 
   const isMobile = useBreakpointValue({ base: true, md: false });
   const navigate = useNavigate();
@@ -78,6 +80,8 @@ export function RecuperarSenha() {
         descricao: "Verifique sua caixa de entrada para redefinir sua senha.",
         tipo: "sucesso",
       });
+
+      
       setEmail("");
     } catch (error) {
       if (error.code === "auth/user-not-found") {
@@ -87,7 +91,7 @@ export function RecuperarSenha() {
       } else {
         setErroEmail("Erro ao enviar e-mail. Tente novamente.");
       }
-    }
+    } 
   };
 
   // Quando o usuário **estiver logado**
@@ -116,6 +120,7 @@ export function RecuperarSenha() {
       return;
     }
 
+    setCarregando(true);
     try {
       const user = auth.currentUser;
 
@@ -170,6 +175,8 @@ export function RecuperarSenha() {
           tipo: "erro",
         });
       }
+    }finally {
+      setCarregando(false);
     }
   };
 
@@ -360,15 +367,27 @@ export function RecuperarSenha() {
                     </Text>
                   )}
 
-                  <Button
-                    w="100%"
-                    bg="#6AB04C"
-                    color="#fff"
-                    mt="1rem"
-                    onClick={handleAlterarSenha}
-                  >
-                    Alterar Senha
-                  </Button>
+                  {carregando ? (
+                    <Button
+                      w={{ base: "200px", md: "250px", lg: "350px" }}
+                      mt="1rem"
+                      bg={"#6AB04C"}
+                      color="#fff"
+                      alignSelf="center"
+                    >
+                      <SpinnerPage cor="#fff" />
+                    </Button>
+                  ) : (
+                    <Button
+                      w="100%"
+                      bg="#6AB04C"
+                      color="#fff"
+                      mt="1rem"
+                      onClick={handleAlterarSenha}
+                    >
+                      Alterar Senha
+                    </Button>
+                  )}
                 </Box>
               )}
             </Flex>
