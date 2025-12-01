@@ -35,7 +35,7 @@ export function Administrador() {
   const [categorias, setCategorias] = useState([]);
   const [categoriaSelecionada, setCategoriaSelecionada] = useState(null);
   const [carregando, setCarregando] = useState(true);
-  const [mensagem, setMensagem] = useState("");
+  const [notificacao, setNotificacao] = useState(null);
   const [videoAberto, setVideoAberto] = useState(null);
   const [motivoRecusa, setMotivoRecusa] = useState("");
   const [videoParaRecusar, setVideoParaRecusar] = useState(null);
@@ -81,7 +81,10 @@ export function Administrador() {
     const interpreteTipo = video?.tipo || "tipo_desconhecido";
 
     if (!motivoRecusa.trim()) {
-      alert("O motivo da recusa é obrigatório.");
+      setNotificacao({
+        msg: "O motivo da recusa é obrigatório.",
+        tipo: "aviso",
+      });
       return;
     }
 
@@ -115,17 +118,18 @@ export function Administrador() {
       );
 
       // Feedback para o administrador
-      setMensagem("Vídeo recusado. Notificação enviada para o usuário!");
-      setTimeout(() => setMensagem(""), 5000);
+      setNotificacao({
+        msg: "Vídeo recusado",
+        descricao: "Notificação enviada para o usuário!",
+        tipo: "sucesso",
+      });
 
       // Limpar estados e fechar o modal
       setVideoParaRecusar(null);
       setMotivoRecusa("");
-      navigate("/");
     } catch (error) {
-      console.error("Erro ao recusar vídeo:", error);
-      setMensagem("🚨 Erro ao recusar!");
-      setTimeout(() => setMensagem(""), 5000);
+      setNotificacao({ msg: "Erro ao recusar vídeo:", error, tipo: "erro" });
+      setTimeout(() => setNotificacao(""), 5000);
     }
   };
 
@@ -158,8 +162,7 @@ export function Administrador() {
         }))
       );
 
-      setMensagem("✅ Vídeo aprovado!");
-      setTimeout(() => setMensagem(""), 5000);
+      setNotificacao({ msg: "Vídeo aceito!", tipo: "sucesso" });
       setVideoAberto(null);
     } catch (error) {
       console.error("Erro:", error);
@@ -571,8 +574,13 @@ export function Administrador() {
         <Footer />
       </GridItem>
 
-      {mensagem && (
-        <Notificacao mensagem={mensagem} onClose={() => setMensagem("")} />
+      {notificacao && (
+        <Notificacao
+          msg={notificacao?.msg}
+          tipo={notificacao?.tipo}
+          descricao={notificacao?.descricao}
+          onClose={() => setNotificacao(null)}
+        />
       )}
     </Grid>
   );

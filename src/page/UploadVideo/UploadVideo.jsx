@@ -226,6 +226,7 @@ export function UploadVideo() {
               )}
               <Input
                 placeholder="Nome do termo (ex.: elif)"
+                p='.5rem'
                 w={{ base: "200px", md: "250px", lg: "350px" }}
                 mb={3}
                 borderColor={erro ? "red.400" : "#DEF5DE"}
@@ -241,7 +242,7 @@ export function UploadVideo() {
                 mb={3}
                 onChange={(e) => setFile(e.target.files[0])}
                 size={isMobile ? "md" : "lg"}
-                color={erro ? "red.400" : "#DEF5DE"}
+                color={erro ? "red.400" : "#000"}
               />
               <Text color="gray" mb='1rem'> O video precisa ter o máximo 10s de duração.</Text>
               {erro && <Text color="red.500" mb='1rem'>{erro}</Text>}
